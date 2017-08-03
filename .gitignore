@@ -20,3 +20,7 @@ node_modules
 publish/src
 publish/package
 typingz
+demo-ng/lib
+demo-ng/platforms
+demo-ng/node_modules
+demo-ng/hooks

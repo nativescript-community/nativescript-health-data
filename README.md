@@ -1,4 +1,4 @@
-# Your Plugin Name
+<!-- # Your Plugin Name
 
 Add your plugin badges here. See [nativescript-urlhandler](https://github.com/hypery2k/nativescript-urlhandler) for example.
 
@@ -37,4 +37,5 @@ Describe your plugin methods and properties here. See [nativescript-feedback](ht
     
 ## License
 
-Apache License Version 2.0, January 2004
+Apache License Version 2.0, January 2004 -->
+<UNDER CONSTRUCTION>

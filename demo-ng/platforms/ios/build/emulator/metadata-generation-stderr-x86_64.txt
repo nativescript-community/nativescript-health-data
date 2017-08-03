@@ -1,0 +1,48 @@
+clang version 3.9.0 (tags/RELEASE_390/final)
+Target: x86_64-apple-darwin16.7.0
+Thread model: posix
+InstalledDir: 
+clang Invocation:
+ "clang-tool" "-cc1" "-triple" "x86_64-apple-ios8.0.0" "-Wdeprecated-objc-isa-usage" "-Werror=deprecated-objc-isa-usage" "-Werror=implicit-function-declaration" "-fsyntax-only" "-disable-free" "-disable-llvm-verifier" "-discard-value-names" "-main-file-name" "umbrella.h" "-mrelocation-model" "pic" "-pic-level" "2" "-mthread-model" "posix" "-mdisable-fp-elim" "-masm-verbose" "-munwind-tables" "-target-cpu" "core2" "-target-linker-version" "264.3.102" "-v" "-dwarf-column-info" "-debugger-tuning=lldb" "-resource-dir" "../lib/clang/3.9.0" "-isysroot" "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator10.3.sdk" "-D" "__NATIVESCRIPT_METADATA_GENERATOR=1" "-I" "/Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/build/emulator/include" "-I" "/Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/internal" "-I" "/Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/internal/TKLiveSync/include" "-F/Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/build/emulator" "-F/Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/internal/" "-F/Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/../../node_modules/tns-core-modules-widgets/platforms/ios" "-D" "DEBUG=1" "-Wno-unknown-pragmas" "-Wno-ignored-attributes" "-Wno-nullability-completeness" "-Wno-expansion-to-defined" "-std=gnu99" "-fdebug-compilation-dir" "/Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/internal/metadata-generator/bin" "-ferror-limit" "0" "-fmessage-length" "0" "-stack-protector" "1" "-fblocks" "-fimplicit-module-maps" "-fobjc-runtime=ios-8.0.0" "-fencode-extended-block-signature" "-fobjc-exceptions" "-fexceptions" "-fmax-type-align=16" "-fdiagnostics-show-option" "-x" "objective-c" "umbrella.h"
+
+ignoring nonexistent directory "/Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/build/emulator/include"
+ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator10.3.sdk/usr/local/include"
+ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator10.3.sdk/Library/Frameworks"
+#include "..." search starts here:
+#include <...> search starts here:
+ /Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/internal
+ /Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/internal/TKLiveSync/include
+ /Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/build/emulator (framework directory)
+ /Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/internal (framework directory)
+ /Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/../../node_modules/tns-core-modules-widgets/platforms/ios (framework directory)
+ ../lib/clang/3.9.0/include
+ /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator10.3.sdk/usr/include
+ /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator10.3.sdk/System/Library/Frameworks (framework directory)
+End of search list.
+clang version 3.9.0 (tags/RELEASE_390/final)
+Target: x86_64-apple-darwin16.7.0
+Thread model: posix
+InstalledDir: 
+clang Invocation:
+ "objc-metadata-generator" "-cc1" "-triple" "x86_64-apple-ios8.0.0" "-Wdeprecated-objc-isa-usage" "-Werror=deprecated-objc-isa-usage" "-Werror=implicit-function-declaration" "-fsyntax-only" "-disable-free" "-disable-llvm-verifier" "-discard-value-names" "-main-file-name" "umbrella.h" "-mrelocation-model" "pic" "-pic-level" "2" "-mthread-model" "posix" "-mdisable-fp-elim" "-masm-verbose" "-munwind-tables" "-target-cpu" "core2" "-target-linker-version" "264.3.102" "-v" "-dwarf-column-info" "-debugger-tuning=lldb" "-resource-dir" "../lib/clang/3.9.0" "-isysroot" "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator10.3.sdk" "-D" "__NATIVESCRIPT_METADATA_GENERATOR=1" "-I" "/Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/build/emulator/include" "-I" "/Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/internal" "-I" "/Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/internal/TKLiveSync/include" "-F/Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/build/emulator" "-F/Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/internal/" "-F/Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/../../node_modules/tns-core-modules-widgets/platforms/ios" "-D" "DEBUG=1" "-Wno-unknown-pragmas" "-Wno-ignored-attributes" "-Wno-nullability-completeness" "-Wno-expansion-to-defined" "-std=gnu99" "-fdebug-compilation-dir" "/Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/internal/metadata-generator/bin" "-ferror-limit" "0" "-fmessage-length" "0" "-stack-protector" "1" "-fblocks" "-fimplicit-module-maps" "-fobjc-runtime=ios-8.0.0" "-fencode-extended-block-signature" "-fobjc-exceptions" "-fexceptions" "-fmax-type-align=16" "-fdiagnostics-show-option" "-x" "objective-c" "umbrella.h"
+
+clang -cc1 version 3.9.0 based upon LLVM 3.9.0 default target x86_64-apple-darwin16.7.0
+ignoring nonexistent directory "/Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/build/emulator/include"
+ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator10.3.sdk/usr/local/include"
+ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator10.3.sdk/Library/Frameworks"
+#include "..." search starts here:
+#include <...> search starts here:
+ /Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/internal
+ /Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/internal/TKLiveSync/include
+ /Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/build/emulator (framework directory)
+ /Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/internal (framework directory)
+ /Users/filipemendes/dev/nativescript-health-data/demo-ng/platforms/ios/../../node_modules/tns-core-modules-widgets/platforms/ios (framework directory)
+ ../lib/clang/3.9.0/include
+ /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator10.3.sdk/usr/include
+ /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator10.3.sdk/System/Library/Frameworks (framework directory)
+End of search list.
+In file included from umbrella.h:729:
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator10.3.sdk/usr/include/os/log.h:17:2: error: using os/log.h requires Xcode 8 or later
+#error using os/log.h requires Xcode 8 or later
+ ^
+1 error generated.

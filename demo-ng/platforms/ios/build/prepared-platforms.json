@@ -1,0 +1,20 @@
+{
+    "@angular/animations": true,
+    "@angular/common": true,
+    "@angular/compiler": true,
+    "@angular/core": true,
+    "@angular/forms": true,
+    "@angular/http": true,
+    "@angular/platform-browser": true,
+    "@angular/router": true,
+    "nativescript-angular": true,
+    "nativescript-health-data": true,
+    "nativescript-theme-core": true,
+    "reflect-metadata": true,
+    "rxjs": true,
+    "tns-core-modules": true,
+    "zone.js": true,
+    "nativescript-intl": true,
+    "symbol-observable": true,
+    "tns-core-modules-widgets": true
+}

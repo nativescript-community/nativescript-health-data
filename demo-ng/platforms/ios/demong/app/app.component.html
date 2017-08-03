@@ -1,0 +1,9 @@
+<ActionBar title="Testing Health Data" class="action-bar">
+</ActionBar>
+<StackLayout>
+    <Label horizontalAlignment="center" [text]="healthData.message" textWrap="true"></Label>
+    <Label horizontalAlignment="center" [text]="healthData.result" textWrap="true"></Label>
+    <Button text="View BodyMassIndex" (tap)="showData('bodyMassIndex')"></Button>
+    <Button text="View BloodPressureSystolic" (tap)="showData('bloodPressureSystolic')"></Button>
+    <Button text="View BloodPressureDistolic" (tap)="showData('bloodPressureDiastolic')"></Button>
+</StackLayout>

@@ -1,0 +1,8 @@
+<ActionBar title="Testing Health Data" class="action-bar">
+</ActionBar>
+<StackLayout>
+    <Label text='{{ healthData.message }}'></Label>
+    <Button *ngIf='healthData.hasPermissions' text="View BodyMassIndex" (tap)="showData(bodyMassIndex)"></Button>
+    <Button *ngIf="healthData.hasPermissions" text="View BloodPressureSystolic" (tap)="showData(bloodPressureSystolic)"></Button>
+    <Button *ngIf="healthData.hasPermissions" text="View BloodPressureDistolic" (tap)="showData(bloodPressureDistolic)"></Button>
+</StackLayout>

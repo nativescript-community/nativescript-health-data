@@ -1,0 +1,95 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "nativescript-health-data@file:///Users/filipemendes/dev/nativescript-health-data/src",
+        "scope": null,
+        "escapedName": "nativescript-health-data",
+        "name": "nativescript-health-data",
+        "rawSpec": "file:///Users/filipemendes/dev/nativescript-health-data/src",
+        "spec": "/Users/filipemendes/dev/nativescript-health-data/src",
+        "type": "directory"
+      },
+      "/Users/filipemendes/dev/nativescript-health-data/demo-ng"
+    ]
+  ],
+  "_from": "../src",
+  "_id": "nativescript-health-data@1.0.0",
+  "_inCache": true,
+  "_location": "/nativescript-health-data",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "nativescript-health-data@file:///Users/filipemendes/dev/nativescript-health-data/src",
+    "scope": null,
+    "escapedName": "nativescript-health-data",
+    "name": "nativescript-health-data",
+    "rawSpec": "file:///Users/filipemendes/dev/nativescript-health-data/src",
+    "spec": "/Users/filipemendes/dev/nativescript-health-data/src",
+    "type": "directory"
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "file:../src",
+  "_shasum": "772245779f40f1ecbe7d38a3d2fa71f089a17e13",
+  "_shrinkwrap": null,
+  "_spec": "nativescript-health-data@file:///Users/filipemendes/dev/nativescript-health-data/src",
+  "_where": "/Users/filipemendes/dev/nativescript-health-data/demo-ng",
+  "author": {
+    "name": "Your Name",
+    "email": "youremail@yourdomain.com"
+  },
+  "bootstrapper": "nativescript-plugin-seed",
+  "bugs": {
+    "url": "https://github.com/filipemendes/nativescript-health-data/issues"
+  },
+  "dependencies": {},
+  "description": "Your awesome NativeScript plugin.",
+  "devDependencies": {
+    "prompt": "^1.0.0",
+    "rimraf": "^2.5.0",
+    "tns-core-modules": "^3.1.0",
+    "tns-platform-declarations": "^3.1.0",
+    "tslint": "^5.0.0",
+    "typescript": "~2.3.0"
+  },
+  "homepage": "https://github.com/filipemendes/nativescript-health-data",
+  "keywords": [
+    "NativeScript",
+    "JavaScript",
+    "Android",
+    "iOS"
+  ],
+  "license": "Apache-2.0",
+  "main": "health-data",
+  "name": "nativescript-health-data",
+  "nativescript": {
+    "platforms": {
+      "android": "3.0.0",
+      "ios": "3.0.0"
+    }
+  },
+  "optionalDependencies": {},
+  "peerDependencies": {
+    "tns-core-modules": "^3.0.0"
+  },
+  "readme": "ERROR: No README data found!",
+  "readmeFilename": "README.md",
+  "scripts": {
+    "clean": "rm -rf node_modules && cd ../demo && rm -rf hooks node_modules platforms && cd ../src && npm run plugin.link",
+    "demo.android": "npm i && npm run tsc && cd ../demo && tns run android --syncAllFiles",
+    "demo.ios": "npm i && npm run tsc && cd ../demo && tns run ios --syncAllFiles",
+    "demo.ng.android": "npm i && npm run tsc && cd ../demo-ng && tns run android --syncAllFiles",
+    "demo.ng.ios": "npm i && npm run tsc && cd ../demo-ng && tns run ios --syncAllFiles",
+    "plugin.link": "npm link && cd ../demo && npm link nativescript-health-data && cd ../src",
+    "plugin.ng.link": "npm link && cd ../demo-ng && npm link nativescript-health-data && cd ../src",
+    "plugin.tscwatch": "npm run tsc -- -w",
+    "postclone": "npm i && node scripts/postclone.js && cd ../demo && npm i && cd ../src && npm run plugin.link",
+    "test.android": "npm i && npm run tsc && npm run tslint && cd ../demo && tns build android && tns test android --justlaunch",
+    "test.ios": "npm i && npm run tsc && npm run tslint && cd ../demo && tns build ios && tns test ios --justlaunch",
+    "tsc": "tsc -skipLibCheck",
+    "tslint": "cd .. && tslint \"**/*.ts\" --config tslint.json --exclude \"**/node_modules/**\""
+  },
+  "typings": "index.d.ts",
+  "version": "1.0.0"
+}

@@ -1,0 +1,7 @@
+<Page xmlns="http://schemas.nativescript.org/tns.xsd" loaded="pageLoaded" class="page"
+  xmlns:ui="nativescript-health-data">
+  <StackLayout class="p-20">
+    <Label text="{{ message }}" class="t-20 text-center c-black" textWrap="true"/>
+    <ui:HealthDataUI message="{{ 'This message is shown by a custom UI component:\n' + message }}" height="100" width="300" backgroundColor="gray" />
+  </StackLayout>
+</Page>

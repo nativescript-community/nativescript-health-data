@@ -16,8 +16,6 @@ export class AppComponent {
 
     showData(data: string) {
         console.log('checking for ' + data);
-        this.healthData.showData(data);
+        this.healthData.getData(data);
     }
-
-    
 }

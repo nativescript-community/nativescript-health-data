@@ -8,6 +8,5 @@ export class Common extends Observable {
 
   constructor() {
     super();
-    this.result = "";
   }
 }

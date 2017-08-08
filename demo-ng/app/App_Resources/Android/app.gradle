@@ -8,9 +8,16 @@
 android {  
   defaultConfig {  
     generatedDensities = []
-    applicationId = "__PACKAGE__"  
+    applicationId = "org.nativescript.demong"  
   }  
   aaptOptions {  
     additionalParameters "--no-version-vectors"  
   }  
+  buildTypes {
+      release {
+          minifyEnabled true
+          // proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+      }
+  }
+
 } 

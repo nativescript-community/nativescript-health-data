@@ -11,7 +11,7 @@ export class HealthData extends Common {
     permissions = {};
     
     getData(data: string) {        
-        console.log('getting constant ' + data);
+        // console.log('getting constant ' + data);
         if(quantityTypes[data]) {
             // check previously given permission. TODO
             this.requestPermissionForData(quantityTypes[data], QuantityTypeNeeded, () => {
@@ -38,9 +38,9 @@ export class HealthData extends Common {
     }
 
     private requestPermissionForData(constToRead: string, type: string, fn) {
-        console.log('request ' + type + ' data');
+        // console.log('request ' + type + ' data');
         if(HKHealthStore.isHealthDataAvailable()) {
-            console.log('Store available');
+            // console.log('Store available');
 
             let dataToAccess;
             if(type === QuantityTypeNeeded) {
@@ -54,12 +54,12 @@ export class HealthData extends Common {
             let readDataType = NSSet.setWithObject(dataToAccess);
             this.healthStore.requestAuthorizationToShareTypesReadTypesCompletion(null, readDataType, (success, error) => {
                 if(success) {
-                    console.log('has rights');
+                    // console.log('has rights');
                     this.permissions[constToRead] = true;
                     fn();
                     return true;
                 } else {
-                    console.log('dont have rights');
+                    // console.log('dont have rights');
                     console.dir(error);
                     this.permissions[constToRead] = false;
                     fn();
@@ -89,7 +89,7 @@ export class HealthData extends Common {
                     }
                     this.result = JSON.stringify(dataToRetrieve);
                 } else {
-                    console.log('error: ');
+                    // console.log('error: ');
                     console.dir(error);
                 }
         });
@@ -97,7 +97,7 @@ export class HealthData extends Common {
     }
 
     private askForCharacteristicData(data: any) {
-        console.log('ask for characteristic data ' + data);
+        // console.log('ask for characteristic data ' + data);
         let dataToRetrieve;
         switch(data) {
             case HKCharacteristicTypeIdentifierBiologicalSex:

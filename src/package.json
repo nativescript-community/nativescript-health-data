@@ -5,6 +5,7 @@
     "main": "health-data",
     "typings": "index.d.ts",
     "nativescript": {
+        "id": "com.tns.NativeScriptApplication",
         "platforms": {
             "android": "3.0.0",
             "ios": "3.0.0"
@@ -16,7 +17,7 @@
         "test.android": "npm i && npm run tsc && npm run tslint && cd ../demo && tns build android && tns test android --justlaunch",
         "test.ios": "npm i && npm run tsc && npm run tslint && cd ../demo && tns build ios && tns test ios --justlaunch",
         "tslint": "cd .. && tslint \"**/*.ts\" --config tslint.json --exclude \"**/node_modules/**\"",
-        "plugin.link": "npm link && cd ../demo && npm link nativescript-health-data && cd ../src",
+        "plugin.link": "npm link && cd ../demo-ng && npm link nativescript-health-data && cd ../src",
         "plugin.tscwatch": "npm run tsc -- -w",
         "demo.ios": "npm i && npm run tsc && cd ../demo && tns run ios --syncAllFiles",
         "demo.android": "npm i && npm run tsc && cd ../demo && tns run android --syncAllFiles",

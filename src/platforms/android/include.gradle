@@ -1,15 +1,33 @@
 /* Include.gradle configuration: http://docs.nativescript.org/plugins/plugins#includegradle-specification */
 
 android {
+	  
+	defaultConfig {  
+		generatedDensities = []
+		applicationId = "com.tns.NativeScriptApplication"  
+		multiDexEnabled  true
+	}  
+  
 	productFlavors {
 		"nativescript-health-data" {
 			dimension "nativescript-health-data"
 		}
 	}
+	buildTypes {
+      release {
+          minifyEnabled true
+        //   proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+      }
+ 	}
+
 }
 
 dependencies {
     // Describe plugin native Android dependencies like
 	// compile "groupName:pluginName:ver" 
     // EXAMPLE: compile "com.facebook.fresco:fresco:0.9.0+"
+	compile 'com.android.support:multidex:1.0.0'
+	compile 'com.google.android.gms:play-services:11.0.4'
+	// compile	'com.google.android.gms:play-services-base:11.0.4'
+	compile 'com.google.android.gms:play-services-fitness:11.0.4'
 }

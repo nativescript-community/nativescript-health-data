@@ -1,8 +1,8 @@
 <ActionBar title="Testing Health Data" class="action-bar">
 </ActionBar>
 <StackLayout>
-    <Label horizontalAlignment="center" [text]="healthData.result" textWrap="true"></Label>
-    <Button text="View BodyMassIndex" (tap)="showData('bodyMassIndex')"></Button>
-    <Button text="View BloodPressureSystolic" (tap)="showData('bloodPressureSystolic')"></Button>
+    <Label horizontalAlignment="center" [text]="messageToShow" textWrap="true"></Label>
+    <Button text="Create client" (tap)="createClient()"></Button>
+    <Button text="Get Something" (tap)="getData('')"></Button>
     <Button text="View BloodPressureDistolic" (tap)="showData('bloodPressureDiastolic')"></Button>
 </StackLayout>

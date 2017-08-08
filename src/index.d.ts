@@ -8,7 +8,13 @@ export declare const CategoryResultNeeded = "category_result_needed";
 export declare class HealthData extends Common {
     healthStore: any;
     permissions: {};
-    getData(data: string): void;
+    getData(data: string, startTimeInMillis: number, endTimeInMillis: number, bucketUnit: string, bucketSize: number, fn: any): void;
+    createClient(): void;
+    private mClient;
+    private getPermissions(fn);
+    private queryFitnessData(data: string, startTimeInMillis: number, endTimeInMillis: number, fn);
+    private parseData(readResult);
+    private dumpDataSet(dataSet);
     private requestPermissionForData(constToRead, type, fn);
     private askForQuantityOrCategoryData(constToRead, type);
     private askForCharacteristicData(data);

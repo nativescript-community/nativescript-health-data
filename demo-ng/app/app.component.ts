@@ -8,13 +8,25 @@ import { Subscription } from 'rxjs/Subscription';
 })
 
 export class AppComponent { 
+    messageToShow: string;
     healthData: HealthData;
-
+    
     constructor() {
         this.healthData = new HealthData();
     }
 
-    showData(data: string) {
-        this.healthData.getData(data);
+    getData(data: string) {
+        let context = this;
+
+        let now = new Date();
+        let before = new Date(2017, 7, 1);
+
+        this.healthData.getData(data, before.valueOf(), now.valueOf(), "days", 1, (returnValue) => {
+            context.messageToShow = returnValue;
+        });
+    }
+
+    createClient() {
+        this.healthData.createClient();
     }
 }

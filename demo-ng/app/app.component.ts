@@ -20,8 +20,16 @@ export class AppComponent {
 
         let now = new Date();
         let before = new Date(2017, 7, 1);
+        
+        let configData = {
+            gfStartTimeInMillis: before.valueOf(),
+            gfEndTimeInMillis: now.valueOf(),
+            gfBucketUnit: "days",
+            gfBucketSize: 1,
+            typeOfData: "TYPE_STEP_COUNT_DELTA"
+        };
 
-        this.healthData.getData(data, before.valueOf(), now.valueOf(), "days", 1, (returnValue) => {
+        this.healthData.getData(configData, (returnValue) => {
             context.messageToShow = returnValue;
         });
     }

@@ -1,4 +1,4 @@
-import { Common } from './health-data.common';
+import { Common, configurationData } from './health-data.common';
 export declare var HKHealthStore: any;
 export declare const QuantityTypeNeeded = "quantity_type_needed";
 export declare const CharacteristicTypeNeeded = "characteristic_type_needed";
@@ -6,13 +6,13 @@ export declare const CategoryTypeNeeded = "category_type_needed";
 export declare const QuantityResultNeeded = "quantity_result_needed";
 export declare const CategoryResultNeeded = "category_result_needed";
 export declare class HealthData extends Common {
+    private mClient;
     healthStore: any;
     permissions: {};
-    getData(data: string, startTimeInMillis: number, endTimeInMillis: number, bucketUnit: string, bucketSize: number, fn: any): void;
+    getData(config: configurationData, fn: any): void;
     createClient(): void;
-    private mClient;
+    private queryFitnessData(config: configurationData, fn);    
     private getPermissions(fn);
-    private queryFitnessData(data: string, startTimeInMillis: number, endTimeInMillis: number, fn);
     private parseData(readResult);
     private dumpDataSet(dataSet);
     private requestPermissionForData(constToRead, type, fn);
@@ -23,6 +23,7 @@ export declare class HealthData extends Common {
     private convertToCategoryIdentifier(data);
     constructor();
 }
+
 export declare const quantityTypes: {
     "appleExerciseTime": string;
     "basalBodyTemperature": string;

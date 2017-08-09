@@ -1,4 +1,4 @@
-import { Common } from './health-data.common';
+import { Common, configurationData } from './health-data.common';
 import * as utils from 'tns-core-modules/utils/utils';
 import * as application from 'tns-core-modules/application';
 import * as platform from 'tns-core-modules/platform';
@@ -11,7 +11,8 @@ var REQUEST_CODE = 1;
 export class HealthData extends Common {
     private mClient: any;
     
-    getData(data: string, startTimeInMillis: number, endTimeInMillis: number, bucketUnit: string, bucketSize: number, fn) {
+    getData(config: configurationData, fn) {
+        console.dir(config);
         if(this.mClient === null) {
             fn(JSON.stringify({
                 "code" : "001",
@@ -19,7 +20,7 @@ export class HealthData extends Common {
             }));
             return;
         } else {
-            this.queryFitnessData(data, startTimeInMillis, endTimeInMillis, bucketUnit, bucketSize, (result) => {
+            this.queryFitnessData(config, (result) => {
                 fn(JSON.stringify({
                     "code" : "000",
                     "description" : "everything is ok",
@@ -30,34 +31,39 @@ export class HealthData extends Common {
         } 
     }
 
-
-    private queryFitnessData(data: string, startTimeInMillis: number, endTimeInMillis: number, bucketUnit: string, bucketSize: number, fn) {
+    private queryFitnessData(config: configurationData, fn) {
         // [START parse_read_data_result]
         // If the DataReadRequest object specified aggregated data, dataReadResult will be returned
         // as buckets containing DataSets, instead of just DataSets.
 
-        let readRequest = new com.google.android.gms.fitness.request.DataReadRequest.Builder()
-            .aggregate(com.google.android.gms.fitness.data.DataType.TYPE_STEP_COUNT_DELTA, 
-                            com.google.android.gms.fitness.data.DataType.AGGREGATE_STEP_COUNT_DELTA);
-        
-        switch(bucketUnit) {
-            case "days":
-                readRequest.bucketByTime(bucketSize, java.util.concurrent.TimeUnit.DAYS);
-                break;
-            case "hours":
-                readRequest.bucketByTime(bucketSize, java.util.concurrent.TimeUnit.HOURS);            
-                break;
-            case "minutes":
-                readRequest.bucketByTime(bucketSize, java.util.concurrent.TimeUnit.MINUTES);
-                break;
-            default:
-                readRequest.bucketByTime(bucketSize, java.util.concurrent.TimeUnit.DAYS);
-                break;
-        }
-            // .setDataType(com.google.android.gms.fitness.data.HealthDataTypes.TYPE_BLOOD_PRESSURE)
-        readRequest = readRequest.setTimeRange(startTimeInMillis, endTimeInMillis, java.util.concurrent.TimeUnit.MILLISECONDS)
+        let readRequest = new com.google.android.gms.fitness.request.DataReadRequest.Builder();
+
+        if(aggregatedDataTypes[config.typeOfData]) {
+            // console.log('aqui');
+            readRequest = readRequest.aggregate(com.google.android.gms.fitness.data.DataType[config.typeOfData], 
+                            aggregatedDataTypes[config.typeOfData]);
+            switch(config.gfBucketUnit) {
+                case "days":
+                    readRequest = readRequest.bucketByTime(config.gfBucketSize, java.util.concurrent.TimeUnit.DAYS);
+                    break;
+                case "hours":
+                    readRequest = readRequest.bucketByTime(config.gfBucketSize, java.util.concurrent.TimeUnit.HOURS);            
+                    break;
+                case "minutes":
+                    readRequest = readRequest.bucketByTime(config.gfBucketSize, java.util.concurrent.TimeUnit.MINUTES);
+                    break;
+                default:
+                    readRequest = readRequest.bucketByTime(config.gfBucketSize, java.util.concurrent.TimeUnit.DAYS);
+                    break;
+            }
+        } else {
+            readRequest = readRequest.read(com.google.android.gms.fitness.data.DataType[config.typeOfData])
+        }        
+
+        // console.log('1');
+        readRequest = readRequest.setTimeRange(config.gfStartTimeInMillis, config.gfEndTimeInMillis, java.util.concurrent.TimeUnit.MILLISECONDS)
                 .build();
-        
+
         let context = this;
         let readResult = com.google.android.gms.fitness.Fitness.HistoryApi.readData(this.mClient, readRequest).setResultCallback(new com.google.android.gms.common.api.ResultCallback({
             onResult: function(result: any) {
@@ -66,12 +72,13 @@ export class HealthData extends Common {
         }));
     }
 
-    private parseData(readResult: any) {
+    private parseData(readResult) {
+        // console.log('2');
         let result = [];
         if(readResult.getBuckets().size() > 0) {
             for(let indexBucket = 0; indexBucket < readResult.getBuckets().size(); indexBucket++) {
                 let dataSets = readResult.getBuckets().get(indexBucket).getDataSets();
-                console.log(dataSets);
+                // console.log(dataSets);
                 // result[indexBucket] = {};
                 for(let indexDataSet = 0; indexDataSet < dataSets.size(); indexDataSet++) {
                     // result[indexBucket][indexDataSet] = this.dumpDataSet(dataSets.get(indexDataSet));
@@ -88,7 +95,8 @@ export class HealthData extends Common {
         return result;
     }
 
-    private dumpDataSet(dataSet: any) {
+    private dumpDataSet(dataSet) {
+        // console.log('3');        
         let result = [];
         let dateFormat = java.text.DateFormat.getTimeInstance();
         console.log('Data returned for Data type: ' + dataSet.getDataType().getName());
@@ -176,3 +184,32 @@ export class HealthData extends Common {
         this.mClient = null;
     }
 }
+
+export const aggregatedDataTypes = {
+    TYPE_STEP_COUNT_DELTA: com.google.android.gms.fitness.data.DataType.AGGREGATE_STEP_COUNT_DELTA,
+    // TYPE_STEP_COUNT_CUMULATIVE: "",
+    // TYPE_STEP_COUNT_CADENCE: "",
+    // TYPE_ACTIVITY_SEGMENT: "",
+    TYPE_CALORIES_CONSUMED: com.google.android.gms.fitness.data.DataType.AGGREGATE_CALORIES_CONSUMED,
+    TYPE_CALORIES_EXPENDED: com.google.android.gms.fitness.data.DataType.AGGREGATE_CALORIES_EXPENDED,
+    TYPE_BASAL_METABOLIC_RATE: com.google.android.gms.fitness.data.DataType.AGGREGATE_BASAL_METABOLIC_RATE_SUMMARY,
+    TYPE_POWER_SAMPLE: com.google.android.gms.fitness.data.DataType.AGGREGATE_POWER_SUMMARY,
+    // TYPE_ACTIVITY_SAMPLE: "",
+    // TYPE_ACTIVITY_SAMPLES: "",
+    TYPE_HEART_RATE_BPM: com.google.android.gms.fitness.data.DataType.AGGREGATE_HEART_RATE_SUMMARY,
+    // TYPE_LOCATION_SAMPLE: "",
+    // TYPE_LOCATION_TRACK: "",
+    TYPE_DISTANCE_DELTA: com.google.android.gms.fitness.data.DataType.AGGREGATE_DISTANCE_DELTA,
+    // TYPE_DISTANCE_CUMULATIVE: "",
+    TYPE_SPEED: com.google.android.gms.fitness.data.DataType.AGGREGATE_SPEED_SUMMARY,
+    // TYPE_CYCLING_WHEEL_REVOLUTION: "",
+    // TYPE_CYCLING_WHEEL_RPM: "",
+    // TYPE_CYCLING_PEDALING_CUMULATIVE: "",
+    // TYPE_CYCLING_PEDALING_CADENCE: "",
+    TYPE_HEIGHT: com.google.android.gms.fitness.data.DataType.AGGREGATE_HEIGHT_SUMMARY,
+    TYPE_WEIGHT: com.google.android.gms.fitness.data.DataType.AGGREGATE_WEIGHT_SUMMARY,
+    TYPE_BODY_FAT_PERCENTAGE: com.google.android.gms.fitness.data.DataType.AGGREGATE_BODY_FAT_PERCENTAGE_SUMMARY,
+    TYPE_NUTRITION: com.google.android.gms.fitness.data.DataType.AGGREGATE_NUTRITION_SUMMARY,
+    TYPE_HYDRATION: com.google.android.gms.fitness.data.DataType.AGGREGATE_HYDRATION,
+    // TYPE_WORKOUT_EXERCISE: "" 
+};

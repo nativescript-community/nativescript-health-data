@@ -1,4 +1,4 @@
-import { Common, configurationData } from './health-data.common';
+import { Common, IConfigurationData } from './health-data.common';
 export declare var HKHealthStore: any;
 export declare const QuantityTypeNeeded = "quantity_type_needed";
 export declare const CharacteristicTypeNeeded = "characteristic_type_needed";
@@ -9,9 +9,9 @@ export declare class HealthData extends Common {
     private mClient;
     healthStore: any;
     permissions: {};
-    getData(config: configurationData, fn: any): void;
-    createClient(): void;
-    private queryFitnessData(config: configurationData, fn);    
+    getData(config: IConfigurationData): Promise<{}>;
+    createClient(): Promise<{}>;
+    private queryFitnessData(config: IConfigurationData, fn): void;
     private getPermissions(fn);
     private parseData(readResult);
     private dumpDataSet(dataSet);

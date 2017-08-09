@@ -1,12 +1,12 @@
-import { Common, configurationData } from './health-data.common';
+import { Common, IConfigurationData } from './health-data.common';
 export declare class HealthData extends Common {
     private mClient;
-    getData(config: configurationData, fn: any): void;
+    getData(config: IConfigurationData): Promise<{}>;
     private queryFitnessData(config, fn);
     private parseData(readResult);
     private dumpDataSet(dataSet);
     private getPermissions(fn);
-    createClient(): void;
+    createClient(): Promise<{}>;
     constructor();
 }
 export declare const aggregatedDataTypes: {

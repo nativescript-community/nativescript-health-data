@@ -14,6 +14,7 @@ export declare class HealthData extends Common {
     private convertToQuantityIdentifier(data);
     private convertToCharacteristicIdentifier(data);
     private convertToCategoryIdentifier(data);
+    createClient(): void;
     constructor();
 }
 export declare const quantityTypes: {

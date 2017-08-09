@@ -148,9 +148,12 @@ export class HealthData extends Common {
         return categoryTypes[data];
     }
 
+    createClient() {
+        this.healthStore = HKHealthStore.new();
+    }
+
     constructor() {
         super();
-        this.healthStore = HKHealthStore.new();
     }
     
 }

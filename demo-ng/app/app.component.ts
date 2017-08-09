@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, NgZone } from "@angular/core";
 import { HealthData } from "nativescript-health-data";
 import { Subscription } from 'rxjs/Subscription';
 
@@ -8,33 +8,41 @@ import { Subscription } from 'rxjs/Subscription';
 })
 
 export class AppComponent { 
-    messageToShow: string;
     healthData: HealthData;
-    
-    constructor() {
+    resultToShow: any;
+
+    constructor(private ngZone: NgZone) {
         this.healthData = new HealthData();
     }
 
     getData(data: string) {
         let context = this;
-
-        let now = new Date();
-        let before = new Date(2017, 7, 1);
-        
         let configData = {
-            gfStartTimeInMillis: before.valueOf(),
-            gfEndTimeInMillis: now.valueOf(),
+            gfStartTimeInMillis: new Date(2017, 7, 1).valueOf(),
+            gfEndTimeInMillis: new Date().valueOf(),
             gfBucketUnit: "days",
             gfBucketSize: 1,
             typeOfData: "TYPE_STEP_COUNT_DELTA"
         };
 
-        this.healthData.getData(configData, (returnValue) => {
-            context.messageToShow = returnValue;
-        });
+        this.healthData.getData(configData)
+            .then((fulfilled) => {
+                this.ngZone.run(() => context.resultToShow = fulfilled);
+            })
+            .catch((error) => {
+                this.ngZone.run(() => context.resultToShow = error);
+            });
     }
 
     createClient() {
-        this.healthData.createClient();
+        let context = this;
+        this.healthData.createClient()
+            .then((fulfilled) => {
+                this.ngZone.run(() => context.resultToShow = fulfilled);
+            })
+            .catch((error) => {
+                this.ngZone.run(() => context.resultToShow = error);
+            });
+
     }
 }

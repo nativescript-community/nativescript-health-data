@@ -1,4 +1,4 @@
-import { Common } from './health-data.common';
+import { Common, IErrorResponse, createIErrorResponse, IConfigurationData, IResultResponse, createIResultResponse } from './health-data.common';
 
 export const QuantityTypeNeeded = "quantity_type_needed";
 export const CharacteristicTypeNeeded = "characteristic_type_needed";
@@ -8,36 +8,71 @@ export const CategoryResultNeeded = "category_result_needed";
 
 export class HealthData extends Common {
     healthStore: HKHealthStore;
-    permissions = {};
-    
-    getData(data: string) {        
+
+    getCommonData(config: IConfigurationData) {
+        const action = "Getting Common Data";
+        return new Promise((resolve, reject) => {
+            const errorResponse: IErrorResponse = createIErrorResponse(action);
+            if(this.healthStore === null) {
+                errorResponse.code = "003";
+                errorResponse.description = "You have to create your client first. Please, use createClient method first";
+                reject(JSON.stringify(errorResponse));
+            } else if(!acceptableDataTypes[config.typeOfData]) {
+                errorResponse.code = "004";
+                errorResponse.description = "The dataType is not supported yet for both platforms. Use getAndroidData() method";
+                reject(JSON.stringify(errorResponse));
+            } else {
+                config.typeOfData = acceptableDataTypes[config.typeOfData];
+                this.getData(config, (result) => {
+                    const successResponse: IResultResponse = createIResultResponse(action);
+                    successResponse.data.type = config.typeOfData;
+                    successResponse.data.response = result;
+                    resolve(JSON.stringify(successResponse));
+                }, (errorMessage) => {
+                    errorResponse.code = "006";
+                    errorResponse.description = errorMessage;
+                    reject(JSON.stringify(errorResponse));
+                });
+            }
+        });
+    }
+
+    getData(config: IConfigurationData, successCallback, failureCallback) {        
         // console.log('getting constant ' + data);
-        if(quantityTypes[data]) {
-            // check previously given permission. TODO
-            this.requestPermissionForData(quantityTypes[data], QuantityTypeNeeded, () => {
-                if(!this.permissions[quantityTypes[data]]) {
-                    return;
-                }
-                this.askForQuantityOrCategoryData(quantityTypes[data], QuantityResultNeeded);
+        if(quantityTypes[config.typeOfData]) {
+            this.requestPermissionForData(quantityTypes[config.typeOfData], QuantityTypeNeeded, () => {
+                this.askForQuantityOrCategoryData(quantityTypes[config.typeOfData], QuantityResultNeeded, (result) => {
+                    successCallback(result);
+                }, (error) => {
+                    failureCallback(error);
+                });
+            }, (error) => {
+                failureCallback(error);
             });
-        } else if(characteristicTypes[data]) {
-            this.requestPermissionForData(characteristicTypes[data], CharacteristicTypeNeeded, () => {
-                if(!this.permissions[characteristicTypes[data]]) {
-                    return;
-                }
-                this.askForCharacteristicData(characteristicTypes[data]);
+        } else if(characteristicTypes[config.typeOfData]) {
+            this.requestPermissionForData(characteristicTypes[config.typeOfData], CharacteristicTypeNeeded, () => {
+                this.askForCharacteristicData(characteristicTypes[config.typeOfData], (result) => {
+                    successCallback(result);
+                }, (error) => {
+                    failureCallback(error);                    
+                });
+            }, (error) => {
+                failureCallback(error);
             });
-        } else if(categoryTypes[data]) {
-            this.requestPermissionForData(categoryTypes[data], CategoryTypeNeeded, () => {
-                if(!this.permissions[categoryTypes[data]]) {
-                    return;
-                }
-                this.askForQuantityOrCategoryData(categoryTypes[data], CategoryResultNeeded);
+        } else if(categoryTypes[config.typeOfData]) {
+            this.requestPermissionForData(categoryTypes[config.typeOfData], CategoryTypeNeeded, () => {
+                this.askForQuantityOrCategoryData(categoryTypes[config.typeOfData], CategoryResultNeeded, (result) => {
+                    successCallback(result);
+                }, (error) => {
+                    failureCallback(error);                    
+                });
+            }, (error) => {
+                failureCallback(error);
             });
         }
     }
 
-    private requestPermissionForData(constToRead: string, type: string, fn) {
+    private requestPermissionForData(constToRead: string, type: string, successCallback, failureCallback) {
         // console.log('request ' + type + ' data');
         if(HKHealthStore.isHealthDataAvailable()) {
             // console.log('Store available');
@@ -54,22 +89,16 @@ export class HealthData extends Common {
             let readDataType = NSSet.setWithObject(dataToAccess);
             this.healthStore.requestAuthorizationToShareTypesReadTypesCompletion(null, readDataType, (success, error) => {
                 if(success) {
-                    // console.log('has rights');
-                    this.permissions[constToRead] = true;
-                    fn();
-                    return true;
+                    successCallback();
                 } else {
-                    // console.log('dont have rights');
                     console.dir(error);
-                    this.permissions[constToRead] = false;
-                    fn();
-                    return false;
+                    failureCallback("You does not have permissions for requested data type");
                 }
             });
         }
     }
 
-    private askForQuantityOrCategoryData(constToRead: string, type: string) {
+    private askForQuantityOrCategoryData(constToRead: string, type: string, successCallback, failureCallback) {
         let objectType;
         if (type === QuantityResultNeeded) {
             objectType = HKObjectType.quantityTypeForIdentifier(constToRead);
@@ -87,16 +116,17 @@ export class HealthData extends Common {
                     for(let index = 0; index < listResults.count; index++) {
                         dataToRetrieve['data'].push(listResults.objectAtIndex(index).quantity.toString());
                     }
-                    this.result = JSON.stringify(dataToRetrieve);
+                    successCallback(dataToRetrieve);
                 } else {
                     // console.log('error: ');
                     console.dir(error);
+                    failureCallback(error);
                 }
         });
         this.healthStore.executeQuery(query);
     }
 
-    private askForCharacteristicData(data: any) {
+    private askForCharacteristicData(data: any, successCallback, failureCallback) {
         // console.log('ask for characteristic data ' + data);
         let dataToRetrieve;
         switch(data) {
@@ -131,9 +161,10 @@ export class HealthData extends Common {
                 };                
                 break;
             default:
+                failureCallback(new Error());
                 return;
         }
-        this.result = JSON.stringify(dataToRetrieve);
+        successCallback(dataToRetrieve);
     }
     
     private convertToQuantityIdentifier(data: string) {
@@ -149,7 +180,22 @@ export class HealthData extends Common {
     }
 
     createClient() {
-        this.healthStore = HKHealthStore.new();
+        const action = "Creating Client";
+        return new Promise((resolve, reject) => {
+            try{
+                this.healthStore = HKHealthStore.new();
+            } catch(e) {
+                console.log(e);
+                const response: IErrorResponse = createIErrorResponse(action);
+                response.code = "001";
+                response.description = "You cannot initialize a new Health Store instance";
+                reject(JSON.stringify(response));
+                return;
+            }
+            const response: IResultResponse = createIResultResponse(action);
+            response.status.message = "Health Store instance initialized successfully";
+            resolve(JSON.stringify(response));
+        });
     }
 
     constructor() {
@@ -159,6 +205,7 @@ export class HealthData extends Common {
 }
 
 export const quantityTypes = {
+    "activeEnergyBurned" : HKQuantityTypeIdentifierActiveEnergyBurned,
     "appleExerciseTime" : HKQuantityTypeIdentifierAppleExerciseTime,
     "basalBodyTemperature" : HKQuantityTypeIdentifierBasalBodyTemperature,
     "basalEnergyBurned": HKQuantityTypeIdentifierBasalEnergyBurned,
@@ -249,5 +296,17 @@ export const categoryTypes = {
     "mindfulSession" : HKCategoryTypeIdentifierMindfulSession,
     "ovulationTestResult" : HKCategoryTypeIdentifierOvulationTestResult,
     "sexualActivity" : HKCategoryTypeIdentifierSexualActivity,
-    "sleepAnalysis" : HKCategoryTypeIdentifierSleepAnalysis
+    // "sleepAnalysis" : HKCategoryTypeIdentifierSleepAnalysis
 }
+
+export const acceptableDataTypes = {
+    "steps" : "stepCount",
+    "distance" : /*"distanceCycling",*/ "distanceWalkingRunning",
+    "calories" : "activeEnergyBurned" /*"basalEnergyBurned"*/,
+    // "activity" : "",
+    "height" : "height",
+    "weight" : "bodyMass",
+    "heartRate" : "heartRate",
+    "fatPercentage" : "bodyFatPercentage",
+    // "nutrition" : ""
+};

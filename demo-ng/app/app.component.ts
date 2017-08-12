@@ -17,15 +17,16 @@ export class AppComponent {
 
     getData(data: string) {
         let context = this;
-        let configData = {
+        
+        const configData = {
             gfStartTimeInMillis: new Date(2017, 7, 1).valueOf(),
             gfEndTimeInMillis: new Date().valueOf(),
             gfBucketUnit: "days",
             gfBucketSize: 1,
-            typeOfData: "TYPE_STEP_COUNT_DELTA"
+            typeOfData: "weight"
         };
 
-        this.healthData.getData(configData)
+        this.healthData.getCommonData(configData)
             .then((fulfilled) => {
                 this.ngZone.run(() => context.resultToShow = fulfilled);
             })
@@ -43,6 +44,5 @@ export class AppComponent {
             .catch((error) => {
                 this.ngZone.run(() => context.resultToShow = error);
             });
-
     }
 }

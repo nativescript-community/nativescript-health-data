@@ -1,4 +1,4 @@
-import { Common } from './health-data.common';
+import { Common, IConfigurationData } from './health-data.common';
 export declare const QuantityTypeNeeded = "quantity_type_needed";
 export declare const CharacteristicTypeNeeded = "characteristic_type_needed";
 export declare const CategoryTypeNeeded = "category_type_needed";
@@ -6,18 +6,19 @@ export declare const QuantityResultNeeded = "quantity_result_needed";
 export declare const CategoryResultNeeded = "category_result_needed";
 export declare class HealthData extends Common {
     healthStore: HKHealthStore;
-    permissions: {};
-    getData(data: string): void;
-    private requestPermissionForData(constToRead, type, fn);
-    private askForQuantityOrCategoryData(constToRead, type);
-    private askForCharacteristicData(data);
+    getCommonData(config: IConfigurationData): Promise<{}>;
+    getData(config: IConfigurationData, successCallback: any, failureCallback: any): void;
+    private requestPermissionForData(constToRead, type, successCallback, failureCallback);
+    private askForQuantityOrCategoryData(constToRead, type, successCallback, failureCallback);
+    private askForCharacteristicData(data, successCallback, failureCallback);
     private convertToQuantityIdentifier(data);
     private convertToCharacteristicIdentifier(data);
     private convertToCategoryIdentifier(data);
-    createClient(): void;
+    createClient(): Promise<{}>;
     constructor();
 }
 export declare const quantityTypes: {
+    "activeEnergyBurned": string;
     "appleExerciseTime": string;
     "basalBodyTemperature": string;
     "basalEnergyBurned": string;
@@ -106,5 +107,13 @@ export declare const categoryTypes: {
     "mindfulSession": string;
     "ovulationTestResult": string;
     "sexualActivity": string;
-    "sleepAnalysis": string;
+};
+export declare const acceptableDataTypes: {
+    "steps": string;
+    "distance": string;
+    "calories": string;
+    "height": string;
+    "weight": string;
+    "heartRate": string;
+    "fatPercentage": string;
 };

@@ -2,6 +2,7 @@ import { Common, IConfigurationData } from './health-data.common';
 export declare class HealthData extends Common {
     private mClient;
     getCommonData(config: IConfigurationData): Promise<{}>;
+    getUncommonData(config: IConfigurationData): Promise<{}>;
     private getData(config, successCallback, failureCallback);
     private queryFitnessData(config, fn);
     private parseData(readResult);

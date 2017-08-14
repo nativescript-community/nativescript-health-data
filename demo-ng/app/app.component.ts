@@ -23,10 +23,10 @@ export class AppComponent {
             gfEndTimeInMillis: new Date().valueOf(),
             gfBucketUnit: "days",
             gfBucketSize: 1,
-            typeOfData: "weight"
+            typeOfData: "bodyMassIndex"
         };
 
-        this.healthData.getCommonData(configData)
+        this.healthData.getUncommonData(configData)
             .then((fulfilled) => {
                 this.ngZone.run(() => context.resultToShow = fulfilled);
             })

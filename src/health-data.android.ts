@@ -11,7 +11,6 @@ var REQUEST_CODE = 1;
 export class HealthData extends Common {
     private mClient: any;
 
-
     getCommonData(config: IConfigurationData) {
         console.dir(config);
         const action = "Getting Common Data";
@@ -43,6 +42,16 @@ export class HealthData extends Common {
                 });
             }
         });
+    }
+
+    getUncommonData(config: IConfigurationData) {
+        const action = "Getting Uncommon Data";
+        return new Promise((resolve, reject) => {
+            const errorResponse: IErrorResponse = createIErrorResponse(action);
+            errorResponse.code = "007";
+            errorResponse.description = "Method not yet supported in Android";
+            reject(JSON.stringify(errorResponse));
+        })
     }
 
     private getData(config: IConfigurationData, successCallback, failureCallback) {

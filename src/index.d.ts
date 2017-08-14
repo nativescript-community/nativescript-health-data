@@ -10,6 +10,7 @@ export declare class HealthData extends Common {
     healthStore: any;
     permissions: {};
     getCommonData(config: IConfigurationData): Promise<{}>;
+    getUncommonData(config: IConfigurationData): Promise<{}>;
     createClient(): Promise<{}>;
     private getData(config, successCallback, failureCallback);
     private queryFitnessData(config: IConfigurationData, fn): void;

@@ -37,7 +37,30 @@ export class HealthData extends Common {
         });
     }
 
-    getData(config: IConfigurationData, successCallback, failureCallback) {        
+    getUncommonData(config: IConfigurationData) {
+        const action = "Getting Uncommon Data";
+        return new Promise((resolve, reject) => {
+            const errorResponse: IErrorResponse = createIErrorResponse(action);
+            if(this.healthStore === null) {
+                errorResponse.code = "003";
+                errorResponse.description = "You have to create your client first. Please, use createClient method first";
+                reject(JSON.stringify(errorResponse));
+            } else {
+                this.getData(config, (result) => {
+                    const successResponse: IResultResponse = createIResultResponse(action);
+                    successResponse.data.type = config.typeOfData;
+                    successResponse.data.response = result;
+                    resolve(JSON.stringify(successResponse));
+                }, (errorMessage) => {
+                    errorResponse.code = "006";
+                    errorResponse.description = errorMessage;
+                    reject(JSON.stringify(errorResponse));
+                });
+            }
+        });
+    }   
+
+    private getData(config: IConfigurationData, successCallback, failureCallback) {        
         // console.log('getting constant ' + data);
         if(quantityTypes[config.typeOfData]) {
             this.requestPermissionForData(quantityTypes[config.typeOfData], QuantityTypeNeeded, () => {
@@ -69,7 +92,10 @@ export class HealthData extends Common {
             }, (error) => {
                 failureCallback(error);
             });
+        } else {
+            failureCallback("Type not supported");
         }
+
     }
 
     private requestPermissionForData(constToRead: string, type: string, successCallback, failureCallback) {
@@ -109,11 +135,13 @@ export class HealthData extends Common {
         let query = HKSampleQuery.alloc().initWithSampleTypePredicateLimitSortDescriptorsResultsHandler(objectType, null, 
             null, NSArray.arrayWithObject(<any>endDateSortDescriptor), (query, results, error) => {
                 if(results) {
+                    console.log(results);
                     let dataToRetrieve = {};
                     dataToRetrieve['type'] = constToRead;
                     dataToRetrieve['data'] = [];
                     let listResults = (<NSArray<HKQuantitySample>>results);
                     for(let index = 0; index < listResults.count; index++) {
+                        console.log(listResults.objectAtIndex(index).metadata);
                         dataToRetrieve['data'].push(listResults.objectAtIndex(index).quantity.toString());
                     }
                     successCallback(dataToRetrieve);
@@ -161,7 +189,6 @@ export class HealthData extends Common {
                 };                
                 break;
             default:
-                failureCallback(new Error());
                 return;
         }
         successCallback(dataToRetrieve);

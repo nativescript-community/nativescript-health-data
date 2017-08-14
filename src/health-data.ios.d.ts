@@ -7,7 +7,8 @@ export declare const CategoryResultNeeded = "category_result_needed";
 export declare class HealthData extends Common {
     healthStore: HKHealthStore;
     getCommonData(config: IConfigurationData): Promise<{}>;
-    getData(config: IConfigurationData, successCallback: any, failureCallback: any): void;
+    getUncommonData(config: IConfigurationData): Promise<{}>;
+    private getData(config, successCallback, failureCallback);
     private requestPermissionForData(constToRead, type, successCallback, failureCallback);
     private askForQuantityOrCategoryData(constToRead, type, successCallback, failureCallback);
     private askForCharacteristicData(data, successCallback, failureCallback);

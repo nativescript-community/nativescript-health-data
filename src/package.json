@@ -37,10 +37,10 @@
         "email": "youremail@yourdomain.com"
     },
     "bugs": {
-        "url": "https://github.com/filipemendes/nativescript-health-data/issues"
+        "url": "https://github.com/filipemendes1994/nativescript-health-data/issues"
     },
     "license": "Apache-2.0",
-    "homepage": "https://github.com/filipemendes/nativescript-health-data",
+    "homepage": "https://github.com/filipemendes1994/nativescript-health-data",
     "readmeFilename": "README.md",
     "peerDependencies": {
         "tns-core-modules": "^3.0.0"

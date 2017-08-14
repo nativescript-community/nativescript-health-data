@@ -135,13 +135,13 @@ export class HealthData extends Common {
         let query = HKSampleQuery.alloc().initWithSampleTypePredicateLimitSortDescriptorsResultsHandler(objectType, null, 
             null, NSArray.arrayWithObject(<any>endDateSortDescriptor), (query, results, error) => {
                 if(results) {
-                    console.log(results);
+                    // console.log(results);
                     let dataToRetrieve = {};
                     dataToRetrieve['type'] = constToRead;
                     dataToRetrieve['data'] = [];
                     let listResults = (<NSArray<HKQuantitySample>>results);
                     for(let index = 0; index < listResults.count; index++) {
-                        console.log(listResults.objectAtIndex(index).metadata);
+                        // console.log(listResults.objectAtIndex(index).metadata);
                         dataToRetrieve['data'].push(listResults.objectAtIndex(index).quantity.toString());
                     }
                     successCallback(dataToRetrieve);

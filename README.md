@@ -89,8 +89,8 @@ In error case, you will receive this one:
 ```
 interface IErrorResponse {
   action: string,
-  code?: string,
-  description?: string
+  code: string,
+  description: string
 }
 ```
 

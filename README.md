@@ -94,7 +94,7 @@ interface IErrorResponse {
 }
 ```
 
-## Admissible Data Types
+## Available Data Types
 Unfortunatelly, this plugin is in the beginning. So, the capabilities are the possibles, for now.
 
 | TypeOfData | GoogleFit Data Type | Apple HealthKit Data Type |

@@ -112,7 +112,7 @@ However, if you really need other data types besides these ones, you can ask for
 
 ```
 const configData = {
-    typeOfData: "bodyMassIndex"
+    typeOfData: "bloodPressureSystolic"
 };
 
 this.healthData.getUncommonData(configData)

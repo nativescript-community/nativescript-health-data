@@ -25,3 +25,5 @@ demo-ng/platforms
 demo-ng/node_modules
 demo-ng/hooks
 demo
+demo-ng/app/client_id.json
+

@@ -34,7 +34,7 @@ import { HealthData } from "nativescript-health-data";
 ### Create HealthData Client
 Before you can grab any kind of user info, you must initialize a client object. Otherwise, you will always get an error response.
 
-```javascript
+```typescript
 let healthData = new HealthData();
 healthData.createClient()
 	.then((fulfilled) => {
@@ -47,7 +47,7 @@ healthData.createClient()
 ### Get Data
 To collect the user data, simply apply this little snippet.
 
-```
+```typescript
 healthData.getCommonData(configData)
 	.then((fulfilled) => {
     	console.log(fulfilled);
@@ -59,7 +59,7 @@ healthData.getCommonData(configData)
 ### Configuration Object
 Like you can see, the ```getCommonData(configObj)``` method receives a configuration object, something like this one above.
 
-```
+```typescript
 interface IConfigurationData {
   gfStartTimeInMillis: number,
   gfEndTimeInMillis: number,
@@ -73,7 +73,7 @@ interface IConfigurationData {
 ### Success and Error Response Messages
 From any API endpoint, you will receive one of these 2 objects. In success case, you will receive this:
 
-```
+```typescript
 interface IResultResponse {
   status: {
     action: string,
@@ -86,7 +86,7 @@ interface IResultResponse {
 ```
 In error case, you will receive this one:
 
-```
+```typescript
 interface IErrorResponse {
   action: string,
   code: string,
@@ -110,7 +110,7 @@ Unfortunatelly, this plugin is in the beginning. So, the capabilities are the po
 I hope I can develop continuously to provide new common data types soon.
 However, if you really need other data types besides these ones, you can ask for them but not commonly. For example, if you need data about Systolic Blood Pressure, you can use this snippet, but you will only get success response message if you are using **iOS**.
 
-```
+```typescript
 const configData = {
     typeOfData: "bloodPressureSystolic"
 };

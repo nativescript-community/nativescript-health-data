@@ -1,4 +1,4 @@
-import { Observable } from 'tns-core-modules/data/observable';
+import { Observable } from "tns-core-modules/data/observable";
 export interface IConfigurationData {
     gfStartTimeInMillis: number;
     gfEndTimeInMillis: number;

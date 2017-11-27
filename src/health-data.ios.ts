@@ -68,7 +68,7 @@ export class HealthData extends Common {
                         quantityTypes[typeOfData],
                         QuantityResultNeeded,
                         result => {
-                            successCallback(result);
+                            successCallback(result.data);
                         },
                         error => {
                             failureCallback(error);
@@ -87,7 +87,7 @@ export class HealthData extends Common {
                     this.askForCharacteristicData(
                         characteristicTypes[typeOfData],
                         result => {
-                            successCallback(result);
+                            successCallback(result.data);
                         },
                         error => {
                             failureCallback(error);
@@ -107,7 +107,7 @@ export class HealthData extends Common {
                         categoryTypes[typeOfData],
                         CategoryResultNeeded,
                         result => {
-                            successCallback(result);
+                            successCallback(result.data);
                         },
                         error => {
                             failureCallback(error);

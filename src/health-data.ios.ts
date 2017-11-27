@@ -1,10 +1,10 @@
 import {
     Common,
-    IErrorResponse,
-    createIErrorResponse,
-    IConfigurationData,
-    IResultResponse,
-    createIResultResponse
+    ErrorResponse,
+    createErrorResponse,
+    ConfigurationData,
+    ResultResponse,
+    createResultResponse
 } from "./health-data.common";
 
 export const QuantityTypeNeeded = "quantity_type_needed";
@@ -16,85 +16,56 @@ export const CategoryResultNeeded = "category_result_needed";
 export class HealthData extends Common {
     healthStore: HKHealthStore;
 
-    getCommonData(config: IConfigurationData) {
-        const action = "Getting Common Data";
-        return new Promise((resolve, reject) => {
-            const errorResponse: IErrorResponse = createIErrorResponse(action);
+    constructor() {
+        super();
+    }
+    getCommonData(config: ConfigurationData) {
+        return new Promise<ResultResponse>((resolve, reject) => {
+            const action = "Getting Common Data";
             if (this.healthStore === null) {
-                errorResponse.code = "003";
-                errorResponse.description =
-                    "You have to create your client first. Please, use createClient method first";
-                reject(JSON.stringify(errorResponse));
+                reject(createErrorResponse(action, "You have to create your client first. Please, use createClient method first"));
             } else if (!acceptableDataTypes[config.typeOfData]) {
-                errorResponse.code = "004";
-                errorResponse.description =
-                    "The dataType is not supported yet for both platforms. Use getAndroidData() method";
-                reject(JSON.stringify(errorResponse));
+                reject(createErrorResponse(action, `The dataType "${config.typeOfData}" is not supported yet for both platforms. Use uncommon method`));
             } else {
-                config.typeOfData = acceptableDataTypes[config.typeOfData];
-                this.getData(
-                    config,
+                this.getData(config,
                     result => {
-                        const successResponse: IResultResponse = createIResultResponse(
-                            action
-                        );
-                        successResponse.data.type = config.typeOfData;
-                        successResponse.data.response = result;
-                        resolve(JSON.stringify(successResponse));
+                        resolve(createResultResponse(action, "success", config.typeOfData, result));
                     },
                     errorMessage => {
-                        errorResponse.code = "006";
-                        errorResponse.description = errorMessage;
-                        reject(JSON.stringify(errorResponse));
-                    }
-                );
+                        reject(createErrorResponse(action, errorMessage));
+                    });
             }
         });
     }
 
-    getUncommonData(config: IConfigurationData) {
-        const action = "Getting Uncommon Data";
-        return new Promise((resolve, reject) => {
-            const errorResponse: IErrorResponse = createIErrorResponse(action);
+    getUncommonData(config: ConfigurationData) {
+        return new Promise<ResultResponse>((resolve, reject) => {
+            const action = "Getting Uncommon Data";
             if (this.healthStore === null) {
-                errorResponse.code = "003";
-                errorResponse.description =
-                    "You have to create your client first. Please, use createClient method first";
-                reject(JSON.stringify(errorResponse));
+                reject(createErrorResponse(action, "You have to create your client first. Please, use createClient method first"));
             } else {
-                this.getData(
-                    config,
-                    result => {
-                        const successResponse: IResultResponse = createIResultResponse(
-                            action
-                        );
-                        successResponse.data.type = config.typeOfData;
-                        successResponse.data.response = result;
-                        resolve(JSON.stringify(successResponse));
-                    },
-                    errorMessage => {
-                        errorResponse.code = "006";
-                        errorResponse.description = errorMessage;
-                        reject(JSON.stringify(errorResponse));
-                    }
-                );
+                this.getData(config, result => {
+                        resolve(createResultResponse(action, "success", config.typeOfData, result));
+                    }, error => {
+                        reject(createErrorResponse(action, error));
+                    });
             }
         });
     }
 
     private getData(
-        config: IConfigurationData,
+        config: ConfigurationData,
         successCallback,
         failureCallback
     ) {
-        // console.log('getting constant ' + data);
-        if (quantityTypes[config.typeOfData]) {
+        let typeOfData = acceptableDataTypes[config.typeOfData];
+        if (quantityTypes[typeOfData]) {
             this.requestPermissionForData(
-                quantityTypes[config.typeOfData],
+                quantityTypes[typeOfData],
                 QuantityTypeNeeded,
                 () => {
                     this.askForQuantityOrCategoryData(
-                        quantityTypes[config.typeOfData],
+                        quantityTypes[typeOfData],
                         QuantityResultNeeded,
                         result => {
                             successCallback(result);
@@ -108,13 +79,13 @@ export class HealthData extends Common {
                     failureCallback(error);
                 }
             );
-        } else if (characteristicTypes[config.typeOfData]) {
+        } else if (characteristicTypes[typeOfData]) {
             this.requestPermissionForData(
-                characteristicTypes[config.typeOfData],
+                characteristicTypes[typeOfData],
                 CharacteristicTypeNeeded,
                 () => {
                     this.askForCharacteristicData(
-                        characteristicTypes[config.typeOfData],
+                        characteristicTypes[typeOfData],
                         result => {
                             successCallback(result);
                         },
@@ -127,13 +98,13 @@ export class HealthData extends Common {
                     failureCallback(error);
                 }
             );
-        } else if (categoryTypes[config.typeOfData]) {
+        } else if (categoryTypes[typeOfData]) {
             this.requestPermissionForData(
-                categoryTypes[config.typeOfData],
+                categoryTypes[typeOfData],
                 CategoryTypeNeeded,
                 () => {
                     this.askForQuantityOrCategoryData(
-                        categoryTypes[config.typeOfData],
+                        categoryTypes[typeOfData],
                         CategoryResultNeeded,
                         result => {
                             successCallback(result);
@@ -158,9 +129,7 @@ export class HealthData extends Common {
         successCallback,
         failureCallback
     ) {
-        // console.log('request ' + type + ' data');
         if (HKHealthStore.isHealthDataAvailable()) {
-            // console.log('Store available');
 
             let dataToAccess;
             if (type === QuantityTypeNeeded) {
@@ -185,7 +154,6 @@ export class HealthData extends Common {
                     if (success) {
                         successCallback();
                     } else {
-                        console.dir(error);
                         failureCallback(
                             "You does not have permissions for requested data type"
                         );
@@ -218,7 +186,6 @@ export class HealthData extends Common {
             NSArray.arrayWithObject(<any>endDateSortDescriptor),
             (query, results, error) => {
                 if (results) {
-                    // console.log(results);
                     let dataToRetrieve = {};
                     dataToRetrieve["type"] = constToRead;
                     dataToRetrieve["data"] = [];
@@ -306,24 +273,13 @@ export class HealthData extends Common {
             try {
                 this.healthStore = HKHealthStore.new();
             } catch (e) {
-                console.log(e);
-                const response: IErrorResponse = createIErrorResponse(action);
-                response.code = "001";
-                response.description =
-                    "You cannot initialize a new Health Store instance";
-                reject(JSON.stringify(response));
+                reject(createErrorResponse(action, "You cannot initialize a new Health Store instance"));
                 return;
             }
-            const response: IResultResponse = createIResultResponse(action);
-            response.status.message =
-                "Health Store instance initialized successfully";
-            resolve(JSON.stringify(response));
+            resolve(createResultResponse(action, "Health Store instance initialized successfully"));
         });
     }
 
-    constructor() {
-        super();
-    }
 }
 
 export const quantityTypes = {

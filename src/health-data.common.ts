@@ -1,8 +1,6 @@
 import { Observable } from "tns-core-modules/data/observable";
-import * as app from "tns-core-modules/application";
-import * as dialogs from "tns-core-modules/ui/dialogs";
 
-export interface IConfigurationData {
+export interface ConfigurationData {
     gfStartTimeInMillis: number;
     gfEndTimeInMillis: number;
     gfBucketUnit: string;
@@ -10,32 +8,40 @@ export interface IConfigurationData {
     typeOfData: string;
 }
 
-export interface IResultResponse {
+export interface ResponseItem {
+    start: Date;
+    end: Date;
+    value: number;
+}
+
+export interface ResultResponse {
     status: {
         action: string;
-        message?: string;
+        message: string;
     };
     data: {
-        type?: string;
-        response?: string;
+        type: string;
+        response: Array<ResponseItem>;
     };
 }
 
-export interface IErrorResponse {
+export interface ErrorResponse {
     action: string;
-    code?: string;
-    description?: string;
+    description: string;
 }
 
-export function createIResultResponse(action: string) {
+export function createResultResponse(action: string, message: string, type?: string, result?: Array<ResponseItem>): ResultResponse {
     return {
-        status: { action },
-        data: {}
+        status: { action, message },
+        data: {
+            type: type || null,
+            response: result || null
+        }
     };
 }
 
-export function createIErrorResponse(action: string) {
-    return { action };
+export function createErrorResponse(action: string, description: string): ErrorResponse {
+    return { action, description };
 }
 
 export class Common extends Observable {

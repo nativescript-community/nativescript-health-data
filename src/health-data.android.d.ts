@@ -1,9 +1,9 @@
 /// <reference path="android.def.d.ts" />
-import { Common, IConfigurationData } from "./health-data.common";
+import { Common, ConfigurationData, ResultResponse } from "./health-data.common";
 export declare class HealthData extends Common {
     private mClient;
-    getCommonData(config: IConfigurationData): Promise<{}>;
-    getUncommonData(config: IConfigurationData): Promise<{}>;
+    getCommonData(config: ConfigurationData): Promise<ResultResponse>;
+    getUncommonData(config: ConfigurationData): Promise<ResultResponse>;
     private getData(config, successCallback, failureCallback);
     private queryFitnessData(config, fn);
     private parseData(readResult);

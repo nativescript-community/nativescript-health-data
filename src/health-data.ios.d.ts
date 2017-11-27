@@ -1,4 +1,4 @@
-import { Common, IConfigurationData } from "./health-data.common";
+import { Common, ConfigurationData, ResultResponse } from "./health-data.common";
 export declare const QuantityTypeNeeded = "quantity_type_needed";
 export declare const CharacteristicTypeNeeded = "characteristic_type_needed";
 export declare const CategoryTypeNeeded = "category_type_needed";
@@ -6,8 +6,9 @@ export declare const QuantityResultNeeded = "quantity_result_needed";
 export declare const CategoryResultNeeded = "category_result_needed";
 export declare class HealthData extends Common {
     healthStore: HKHealthStore;
-    getCommonData(config: IConfigurationData): Promise<{}>;
-    getUncommonData(config: IConfigurationData): Promise<{}>;
+    constructor();
+    getCommonData(config: ConfigurationData): Promise<ResultResponse>;
+    getUncommonData(config: ConfigurationData): Promise<ResultResponse>;
     private getData(config, successCallback, failureCallback);
     private requestPermissionForData(constToRead, type, successCallback, failureCallback);
     private askForQuantityOrCategoryData(constToRead, type, successCallback, failureCallback);
@@ -16,7 +17,6 @@ export declare class HealthData extends Common {
     private convertToCharacteristicIdentifier(data);
     private convertToCategoryIdentifier(data);
     createClient(): Promise<{}>;
-    constructor();
 }
 export declare const quantityTypes: {
     activeEnergyBurned: string;

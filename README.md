@@ -104,7 +104,7 @@ Unfortunatelly, this plugin is in the beginning. So, the capabilities are the po
 | calories | TYPE_CALORIES_EXPENDED | HKQuantityTypeIdentifierActiveEnergyBurned |
 | height | TYPE_HEIGHT | HKQuantityTypeIdentifierHeight |
 | weight | TYPE_WEIGHT | HKQuantityTypeIdentifierBodyMass |
-| hearthRate | TYPE_HEART_RATE_BPM | HKQuantityTypeIdentifierHeartRate |
+| heartRate | TYPE_HEART_RATE_BPM | HKQuantityTypeIdentifierHeartRate |
 | fatPercentage | TYPE_BODY_FAT_PERCENTAGE | HKQuantityTypeIdentifierBodyFatPercentage |
 
 I hope I can develop continuously to provide new common data types soon.

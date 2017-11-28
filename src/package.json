@@ -46,8 +46,8 @@
         "tns-core-modules": "^3.0.0"
     },
     "devDependencies": {
-        "tns-core-modules": "^3.1.0",
-        "tns-platform-declarations": "^3.1.0",
+        "tns-core-modules": "^3.3.0",
+        "tns-platform-declarations": "^3.3.0",
         "typescript": "~2.3.0",
         "prompt": "^1.0.0",
         "rimraf": "^2.5.0",

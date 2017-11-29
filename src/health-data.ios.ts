@@ -4,8 +4,10 @@ import {
     createErrorResponse,
     ConfigurationData,
     ResultResponse,
+    ResponseItem,
     createResultResponse
 } from "./health-data.common";
+import * as utils from 'tns-core-modules/utils/utils';
 
 export const QuantityTypeNeeded = "quantity_type_needed";
 export const CharacteristicTypeNeeded = "characteristic_type_needed";
@@ -55,10 +57,11 @@ export class HealthData extends Common {
 
     private getData(
         config: ConfigurationData,
-        successCallback,
+        successCallback: (result: Array<ResponseItem>) => void,
         failureCallback
     ) {
         let typeOfData = acceptableDataTypes[config.typeOfData];
+        console.log(typeOfData);
         if (quantityTypes[typeOfData]) {
             this.requestPermissionForData(
                 quantityTypes[typeOfData],
@@ -68,7 +71,7 @@ export class HealthData extends Common {
                         quantityTypes[typeOfData],
                         QuantityResultNeeded,
                         result => {
-                            successCallback(result.data);
+                            successCallback(result);
                         },
                         error => {
                             failureCallback(error);
@@ -87,7 +90,7 @@ export class HealthData extends Common {
                     this.askForCharacteristicData(
                         characteristicTypes[typeOfData],
                         result => {
-                            successCallback(result.data);
+                            successCallback(result);
                         },
                         error => {
                             failureCallback(error);
@@ -107,7 +110,7 @@ export class HealthData extends Common {
                         categoryTypes[typeOfData],
                         CategoryResultNeeded,
                         result => {
-                            successCallback(result.data);
+                            successCallback(result);
                         },
                         error => {
                             failureCallback(error);
@@ -166,7 +169,7 @@ export class HealthData extends Common {
     private askForQuantityOrCategoryData(
         constToRead: string,
         type: string,
-        successCallback,
+        successCallback: (response: Array<ResponseItem>) => void,
         failureCallback
     ) {
         let objectType;
@@ -186,17 +189,21 @@ export class HealthData extends Common {
             NSArray.arrayWithObject(<any>endDateSortDescriptor),
             (query, results, error) => {
                 if (results) {
-                    let dataToRetrieve = {};
-                    dataToRetrieve["type"] = constToRead;
-                    dataToRetrieve["data"] = [];
                     let listResults = <NSArray<HKQuantitySample>>results;
+                    let parsedData = new Array<ResponseItem>();
                     for (let index = 0; index < listResults.count; index++) {
-                        // console.log(listResults.objectAtIndex(index).metadata);
-                        dataToRetrieve["data"].push(
-                            listResults.objectAtIndex(index).quantity.toString()
-                        );
+                        // console.log(listResults.objectAtIndex(index).startDate);
+                        // console.log(listResults.objectAtIndex(index).endDate);
+                        // console.log(listResults.objectAtIndex(index).quantity);
+                        // console.log(listResults.objectAtIndex(index).quantityType);
+                        const {startDate, endDate, quantity, quantityType} = listResults.objectAtIndex(index);
+                        parsedData.push({
+                            start: startDate,
+                            end: endDate,
+                            value: quantity.toString()
+                        } as ResponseItem);
                     }
-                    successCallback(dataToRetrieve);
+                    successCallback(parsedData);
                 } else {
                     // console.log('error: ');
                     console.dir(error);
@@ -209,7 +216,7 @@ export class HealthData extends Common {
 
     private askForCharacteristicData(
         data: any,
-        successCallback,
+        successCallback: (result: Array<ResponseItem>) => void,
         failureCallback
     ) {
         // console.log('ask for characteristic data ' + data);

@@ -152,6 +152,7 @@ export class HealthData extends Common {
                 indexBucket < readResult.getBuckets().size();
                 indexBucket++
             ) {
+                // console.log(readResult.getBuckets().get(indexBucket));
                 let dataSets = readResult
                     .getBuckets()
                     .get(indexBucket)
@@ -184,15 +185,12 @@ export class HealthData extends Common {
         let result = [];
         let dateFormat = java.text.DateFormat.getTimeInstance();
         for (let index = 0; index < dataSet.getDataPoints().size(); index++) {
-            let prev = {};
             let pos = dataSet.getDataPoints().get(index);
-            // prev['type'] = pos.getDataType().getName();
-            prev["startTime"] = new Date(
-                pos.getStartTime(java.util.concurrent.TimeUnit.MILLISECONDS)
-            ).toString();
-            prev["endTime"] = new Date(
-                pos.getEndTime(java.util.concurrent.TimeUnit.MILLISECONDS)
-            ).toString();
+
+            // console.log('Data point: ');
+            // console.log('Type:' + pos.getDataType().getName());
+            // console.log('Start:' + new Date(pos.getStartTime(java.util.concurrent.TimeUnit.MILLISECONDS)).toString());
+            // console.log('End:' + new Date(pos.getEndTime(java.util.concurrent.TimeUnit.MILLISECONDS)).toString());
             for (
                 let indexField = 0;
                 indexField <
@@ -206,9 +204,14 @@ export class HealthData extends Common {
                     .getDataType()
                     .getFields()
                     .get(indexField);
-                prev[field.getName()] = pos.getValue(field).toString();
+
+                result.push({
+                    start: new Date(pos.getStartTime(java.util.concurrent.TimeUnit.MILLISECONDS)),
+                    end: new Date(pos.getEndTime(java.util.concurrent.TimeUnit.MILLISECONDS)),
+                    value: pos.getValue(field).toString()
+                });
+                // console.log('Field: ' + field.getName() + ' Value:' + pos.getValue(field));
             }
-            result.push(prev);
         }
         return result;
     }

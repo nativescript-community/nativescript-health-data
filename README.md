@@ -60,7 +60,7 @@ healthData.getCommonData(configData)
 Like you can see, the ```getCommonData(configObj)``` method receives a configuration object, something like this one above.
 
 ```typescript
-interface IConfigurationData {
+interface ConfigurationData {
   gfStartTimeInMillis: number,
   gfEndTimeInMillis: number,
   gfBucketUnit: string, 
@@ -74,23 +74,29 @@ interface IConfigurationData {
 From any API endpoint, you will receive one of these 2 objects. In success case, you will receive this:
 
 ```typescript
-interface IResultResponse {
-  status: {
-    action: string,
-    message: string
-  }, data: {
-    type: string,
-    response: string
-  } 
+interface ResultResponse {
+    status: {
+        action: string;
+        message: string;
+    };
+    data: {
+        type: string;
+        response: Array<ResponseItem>;
+    };
+}
+
+interface ResponseItem {
+    start: Date;
+    end: Date;
+    value: string;
 }
 ```
 In error case, you will receive this one:
 
 ```typescript
-interface IErrorResponse {
-  action: string,
-  code: string,
-  description: string
+interface ErrorResponse {
+    action: string;
+    description: string;
 }
 ```
 

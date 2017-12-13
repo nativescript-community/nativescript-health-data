@@ -6,14 +6,14 @@ import {
     ResultResponse,
     ResponseItem,
     createResultResponse
-} from "./health-data.common";
+} from './health-data.common';
 import * as utils from 'tns-core-modules/utils/utils';
 
-export const QuantityTypeNeeded = "quantity_type_needed";
-export const CharacteristicTypeNeeded = "characteristic_type_needed";
-export const CategoryTypeNeeded = "category_type_needed";
-export const QuantityResultNeeded = "quantity_result_needed";
-export const CategoryResultNeeded = "category_result_needed";
+export const QuantityTypeNeeded = 'quantity_type_needed';
+export const CharacteristicTypeNeeded = 'characteristic_type_needed';
+export const CategoryTypeNeeded = 'category_type_needed';
+export const QuantityResultNeeded = 'quantity_result_needed';
+export const CategoryResultNeeded = 'category_result_needed';
 
 export class HealthData extends Common {
     healthStore: HKHealthStore;
@@ -23,34 +23,71 @@ export class HealthData extends Common {
     }
     getCommonData(config: ConfigurationData) {
         return new Promise<ResultResponse>((resolve, reject) => {
-            const action = "Getting Common Data";
+            const action = 'Getting Common Data';
             if (this.healthStore === null) {
-                reject(createErrorResponse(action, "You have to create your client first. Please, use createClient method first"));
+                reject(
+                    createErrorResponse(
+                        action,
+                        'You have to create your client first. Please, use createClient method first'
+                    )
+                );
             } else if (!acceptableDataTypes[config.typeOfData]) {
-                reject(createErrorResponse(action, `The dataType "${config.typeOfData}" is not supported yet for both platforms. Use uncommon method`));
+                reject(
+                    createErrorResponse(
+                        action,
+                        `The dataType "${
+                            config.typeOfData
+                        }" is not supported yet for both platforms. Use uncommon method`
+                    )
+                );
             } else {
-                this.getData(config,
+                this.getData(
+                    config,
                     result => {
-                        resolve(createResultResponse(action, "success", config.typeOfData, result));
+                        resolve(
+                            createResultResponse(
+                                action,
+                                'success',
+                                config.typeOfData,
+                                result
+                            )
+                        );
                     },
                     errorMessage => {
                         reject(createErrorResponse(action, errorMessage));
-                    });
+                    }
+                );
             }
         });
     }
 
     getUncommonData(config: ConfigurationData) {
         return new Promise<ResultResponse>((resolve, reject) => {
-            const action = "Getting Uncommon Data";
+            const action = 'Getting Uncommon Data';
             if (this.healthStore === null) {
-                reject(createErrorResponse(action, "You have to create your client first. Please, use createClient method first"));
+                reject(
+                    createErrorResponse(
+                        action,
+                        'You have to create your client first. Please, use createClient method first'
+                    )
+                );
             } else {
-                this.getData(config, result => {
-                        resolve(createResultResponse(action, "success", config.typeOfData, result));
-                    }, error => {
+                this.getData(
+                    config,
+                    result => {
+                        resolve(
+                            createResultResponse(
+                                action,
+                                'success',
+                                config.typeOfData,
+                                result
+                            )
+                        );
+                    },
+                    error => {
                         reject(createErrorResponse(action, error));
-                    });
+                    }
+                );
             }
         });
     }
@@ -70,6 +107,7 @@ export class HealthData extends Common {
                     this.askForQuantityOrCategoryData(
                         quantityTypes[typeOfData],
                         QuantityResultNeeded,
+                        config,
                         result => {
                             successCallback(result);
                         },
@@ -109,6 +147,7 @@ export class HealthData extends Common {
                     this.askForQuantityOrCategoryData(
                         categoryTypes[typeOfData],
                         CategoryResultNeeded,
+                        config,
                         result => {
                             successCallback(result);
                         },
@@ -122,7 +161,7 @@ export class HealthData extends Common {
                 }
             );
         } else {
-            failureCallback("Type not supported");
+            failureCallback('Type not supported');
         }
     }
 
@@ -133,7 +172,6 @@ export class HealthData extends Common {
         failureCallback
     ) {
         if (HKHealthStore.isHealthDataAvailable()) {
-
             let dataToAccess;
             if (type === QuantityTypeNeeded) {
                 dataToAccess = HKObjectType.quantityTypeForIdentifier(
@@ -158,7 +196,7 @@ export class HealthData extends Common {
                         successCallback();
                     } else {
                         failureCallback(
-                            "You does not have permissions for requested data type"
+                            'You does not have permissions for requested data type'
                         );
                     }
                 }
@@ -169,6 +207,7 @@ export class HealthData extends Common {
     private askForQuantityOrCategoryData(
         constToRead: string,
         type: string,
+        config: ConfigurationData,
         successCallback: (response: Array<ResponseItem>) => void,
         failureCallback
     ) {
@@ -182,11 +221,23 @@ export class HealthData extends Common {
             HKSampleSortIdentifierEndDate,
             false
         );
-        let query = HKSampleQuery.alloc().initWithSampleTypePredicateLimitSortDescriptorsResultsHandler(
+        let startDate = NSDateComponents.alloc();
+        startDate.day = config.startDate.getUTCDate();
+        startDate.year = config.startDate.getUTCFullYear();
+        startDate.month = config.startDate.getUTCMonth() + 1;
+        let endDate = NSDateComponents.alloc();
+        endDate.day = config.endDate.getUTCDate();
+        endDate.year = config.endDate.getUTCFullYear();
+        endDate.month = config.endDate.getUTCMonth() + 1;
+        let query = HKSampleQuery.alloc()
+            .initWithSampleTypePredicateLimitSortDescriptorsResultsHandler(
             objectType,
+            HKQuery.predicateForActivitySummariesBetweenStartDateComponentsEndDateComponents(
+                startDate,
+                endDate
+            ),
             null,
-            null,
-            NSArray.arrayWithObject(<any>endDateSortDescriptor),
+            NSArray.arrayWithObject<NSSortDescriptor>(endDateSortDescriptor),
             (query, results, error) => {
                 if (results) {
                     let listResults = <NSArray<HKQuantitySample>>results;
@@ -196,7 +247,12 @@ export class HealthData extends Common {
                         // console.log(listResults.objectAtIndex(index).endDate);
                         // console.log(listResults.objectAtIndex(index).quantity);
                         // console.log(listResults.objectAtIndex(index).quantityType);
-                        const {startDate, endDate, quantity, quantityType} = listResults.objectAtIndex(index);
+                        const {
+                            startDate,
+                            endDate,
+                            quantity,
+                            quantityType
+                        } = listResults.objectAtIndex(index);
                         parsedData.push({
                             start: startDate,
                             end: endDate,
@@ -275,18 +331,36 @@ export class HealthData extends Common {
     }
 
     createClient() {
-        const action = "Creating Client";
+        const action = 'Creating Client';
         return new Promise((resolve, reject) => {
             try {
+                if (!HKHealthStore.isHealthDataAvailable()) {
+                    reject(
+                        createErrorResponse(
+                            action,
+                            'You dont have health store available'
+                        )
+                    );
+                    return;
+                }
                 this.healthStore = HKHealthStore.new();
             } catch (e) {
-                reject(createErrorResponse(action, "You cannot initialize a new Health Store instance"));
+                reject(
+                    createErrorResponse(
+                        action,
+                        'You cannot initialize a new Health Store instance'
+                    )
+                );
                 return;
             }
-            resolve(createResultResponse(action, "Health Store instance initialized successfully"));
+            resolve(
+                createResultResponse(
+                    action,
+                    'Health Store instance initialized successfully'
+                )
+            );
         });
     }
-
 }
 
 export const quantityTypes = {
@@ -385,13 +459,13 @@ export const categoryTypes = {
 };
 
 export const acceptableDataTypes = {
-    steps: "stepCount",
-    distance: /*"distanceCycling",*/ "distanceWalkingRunning",
-    calories: "activeEnergyBurned" /*"basalEnergyBurned"*/,
+    steps: 'stepCount',
+    distance: /*"distanceCycling",*/ 'distanceWalkingRunning',
+    calories: 'activeEnergyBurned' /*"basalEnergyBurned"*/,
     // "activity" : "",
-    height: "height",
-    weight: "bodyMass",
-    heartRate: "heartRate",
-    fatPercentage: "bodyFatPercentage"
+    height: 'height',
+    weight: 'bodyMass',
+    heartRate: 'heartRate',
+    fatPercentage: 'bodyFatPercentage'
     // "nutrition" : ""
 };

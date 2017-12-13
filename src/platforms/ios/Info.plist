@@ -7,8 +7,6 @@
 	<string>HealthKit Share Usage Description</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>HealthKit Update Usage Description</string>
-	<!-- <key>com.apple.developer.healthkit</key>
-	<true/>  -->
 
 </dict>
 </plist>

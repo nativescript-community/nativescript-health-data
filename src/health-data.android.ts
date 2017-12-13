@@ -121,8 +121,8 @@ export class HealthData extends Common {
 
         let dataReadRequest = readRequest
             .setTimeRange(
-                config.gfStartTimeInMillis,
-                config.gfEndTimeInMillis,
+                config.startDate.getTime(),
+                config.endDate.getTime(),
                 java.util.concurrent.TimeUnit.MILLISECONDS
             )
             .build();
@@ -385,7 +385,7 @@ export class HealthData extends Common {
     }
 
     private validateConfiguration(config: ConfigurationData) {
-        return config.gfEndTimeInMillis > config.gfStartTimeInMillis;
+        return config.endDate > config.startDate;
     }
 
     constructor() {

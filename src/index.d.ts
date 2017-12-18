@@ -6,23 +6,27 @@ export declare const CategoryTypeNeeded = "category_type_needed";
 export declare const QuantityResultNeeded = "quantity_result_needed";
 export declare const CategoryResultNeeded = "category_result_needed";
 export declare class HealthData extends Common {
-    private mClient;
-    healthStore: any;
-    permissions: {};
-    getCommonData(config: ConfigurationData): Promise<ResultResponse>;
-    getUncommonData(config: ConfigurationData): Promise<ResultResponse>;
-    createClient(): Promise<{}>;
-    private getData(config, successCallback, failureCallback);
-    private queryFitnessData(config: ConfigurationData, fn): void;
-    private getPermissions(fn);
-    private parseData(readResult);
-    private dumpDataSet(dataSet);
-    private requestPermissionForData(constToRead, type, fn);
-    private askForQuantityOrCategoryData(constToRead, type);
-    private askForCharacteristicData(data);
-    private convertToQuantityIdentifier(data);
-    private convertToCharacteristicIdentifier(data);
-    private convertToCategoryIdentifier(data);
+    isAvailable(): boolean;
+    requestAuthorization(datatypes, onSuccess, onError);
+    isAuthorized(datatypes, onSuccess, onError);
+    query(opts, onSuccess, onError);
+    queryAggregated(opts, onSuccess, onError)
+    store(data, onSuccess, onError);
+    delete(data, onSuccess, onError);
+    // getCommonData(config: ConfigurationData): Promise<ResultResponse>;
+    // getUncommonData(config: ConfigurationData): Promise<ResultResponse>;
+    // createClient(): Promise<{}>;
+    // private getData(config, successCallback, failureCallback);
+    // private queryFitnessData(config: ConfigurationData, fn): void;
+    // private getPermissions(fn);
+    // private parseData(readResult);
+    // private dumpDataSet(dataSet);
+    // private requestPermissionForData(constToRead, type, fn);
+    // private askForQuantityOrCategoryData(constToRead, type);
+    // private askForCharacteristicData(data);
+    // private convertToQuantityIdentifier(data);
+    // private convertToCharacteristicIdentifier(data);
+    // private convertToCategoryIdentifier(data);
     constructor();
 }
 
@@ -117,3 +121,29 @@ export declare const categoryTypes: {
     "sexualActivity": string;
     "sleepAnalysis": string;
 };
+
+// android
+
+/*
+isAvailable(onSuccess, onError);
+requestAuthorization(datatypes, onSuccess, onError);
+isAuthorized(datatypes, onSuccess, onError);
+query(opts, onSuccess, onError);
+queryAggregated(opts, onSuccess, onError)
+store(data, onSuccess, onError);
+delete(data, onSuccess, onError);
+*/
+
+
+// ios
+
+/*
+isAvailable(success, error);
+requestAuthorization(dts, onSuccess, onError);
+isAuthorized(dts, onSuccess, onError);
+query(opts, onSuccess, onError);
+queryAggregated(opts, onSuccess, onError);
+store(data, onSuccess, onError);
+delete(data, onSuccess, onError);
+
+*/ 

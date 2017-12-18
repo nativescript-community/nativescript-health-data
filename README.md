@@ -2,14 +2,11 @@
 ## A cross platform (iOS & Android) plugin 
 
 ### Description
-This is a NativeScript plugin that abstracts Apple HealthKit and Google Fit repositories to collect some health data from user's smartphone. Unfortunately, I am a starter in NativeScript's plugins development so, because of that, not every data type is available right now.
+This is a NativeScript plugin that abstracts Apple HealthKit and Google Fit repositories to collect health data from user's smartphone. Unfortunately, I am a starter in NativeScript's plugins development so, because of that, not every data type is available right now.
 
 This work is based on [Cordova Health Plugin](https://github.com/dariosalvi78/cordova-plugin-health) (the propose, not the code). If you are experiencing some kind of issue, feel free to contact me or open a repository issue.   
 
 ## Prerequisites
-iOS - Cocoapods is [installed](https://guides.cocoapods.org/using/getting-started.html#getting-started)
-
-Android - Latest Google Play services SDK [installed](https://developer.android.com/studio/intro/update.html)
 
 Google Fit API Key - Go to the [Google Developers Console](https://console.developers.google.com/), create a project, and enable the ```Google Fitness API```. Then under credentials, create an OAuth for an Android App. If you are using Linux/OSX, generate your SHA1-key with the code below. Then, make sure you download the result OAuth client key, rename it to ```client_id.json``` and place it in project root directory.
 

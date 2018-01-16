@@ -16,18 +16,18 @@ const REQUEST_CODE = 1;
 
 // android imports
 
+const ContextCompat = <any>android.support.v4.content.ContextCompat;
+const DataReadRequest  = com.google.android.gms.fitness.request.DataReadRequest;
 const DataType = com.google.android.gms.fitness.data.DataType;
-const GoogleApiClient = com.google.android.gms.common.api.GoogleApiClient;
 const Fitness = com.google.android.gms.fitness.Fitness;
+const GoogleApiAvailability = com.google.android.gms.common.GoogleApiAvailability;
+const GoogleApiClient = com.google.android.gms.common.api.GoogleApiClient;
+const HistoryApi = com.google.android.gms.fitness.Fitness.HistoryApi;
+const PackageManager = android.content.pm.PackageManager;
+const ResultCallback = com.google.android.gms.common.api.ResultCallback;
 const Scope = com.google.android.gms.common.api.Scope;
 const Scopes = com.google.android.gms.common.Scopes;
 const TimeUnit = java.util.concurrent.TimeUnit;
-const GoogleApiAvailability = com.google.android.gms.common.GoogleApiAvailability;
-const DataReadRequest  = com.google.android.gms.fitness.request.DataReadRequest;
-const PackageManager = android.content.pm.PackageManager;
-const HistoryApi = com.google.android.gms.fitness.Fitness.HistoryApi;
-const ResultCallback = com.google.android.gms.common.api.ResultCallback;
-const ContextCompat = <any>android.support.v4.content.ContextCompat;
 
 
 
@@ -37,12 +37,12 @@ export class HealthData extends Common {
     isAvailable(): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
             // first check that the Google APIs are available
-            let gapi = GoogleApiAvailability.getInstance();
-            let apiresult = gapi.isGooglePlayServicesAvailable(
+            let gApi = GoogleApiAvailability.getInstance();
+            let apiResult = gApi.isGooglePlayServicesAvailable(
                 utils.ad.getApplicationContext()
             );
             if (
-                apiresult ===
+                apiResult ===
                 com.google.android.gms.common.ConnectionResult.SUCCESS
             ) {
                 // then check that Google Fit is actually installed
@@ -67,7 +67,7 @@ export class HealthData extends Common {
         });
     }
 
-    private queryFitnessData(config: ConfigurationData, fn) {
+    private queryFitnessData(config: ConfigurationData, callback: (result) => void) {
         // [START parse_read_data_result]
         // If the DataReadRequest object specified aggregated data, dataReadResult will be returned
         // as buckets containing DataSets, instead of just DataSets.
@@ -125,7 +125,7 @@ export class HealthData extends Common {
             ).setResultCallback(
                 new ResultCallback({
                     onResult: (result) => {
-                        fn(this.parseData(result as any));
+                        callback(this.parseData(result as any));
                     }
                 })
             );
@@ -324,7 +324,9 @@ export class HealthData extends Common {
                         console.log(
                             'Google Play services connection failed'
                         );
+                        console.log(result.getErrorMessage());
                         if (result.hasResolution()) {
+                            console.log('But wait there is a possible resolution, let me try!');
                             this.requestAuthorization(
                                 [
                                     'GET_ACCOUNTS',

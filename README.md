@@ -128,8 +128,6 @@ this.healthData.getUncommonData(configData)
 ```
 You can check available uncommon data in [iOS Plugin File](https://github.com/filipemendes1994/nativescript-health-data/blob/master/src/health-data.ios.ts)
 
-## Appreciations
-This plugin was developed while working for SPMS, Shared Services for Ministry of Health (of Portugal), in a very innovative project, written in [Nativescript integrated with Angular](https://github.com/NativeScript/nativescript-angular). My acknowledgment to them for the opportunity.
-
-## License
-Apache License Version 2.0, January 2004
+## Credits
+* [Filipe Mendes](https://github.com/filipemendes1994/) for a superb first version of this repo, while working for SPMS, Shared Services for Ministry of Health (of Portugal). He kindly transferred this repo to me when he no longer had time to maintain it.
+* Daniel Leal, for [a great PR](https://github.com/EddyVerbruggen/nativescript-health-data/pull/4).

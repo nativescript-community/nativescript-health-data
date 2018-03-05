@@ -40,7 +40,7 @@
     "bugs": {
         "url": "https://github.com/filipemendes1994/nativescript-health-data/issues"
     },
-    "license": "Apache-2.0",
+    "license": "MIT",
     "homepage": "https://github.com/filipemendes1994/nativescript-health-data",
     "readmeFilename": "README.md",
     "peerDependencies": {

@@ -9,7 +9,7 @@ export interface ConfigurationData {
 export interface ResponseItem {
     start: Date;
     end: Date;
-    value: number;
+    value: string;
 }
 export interface ResultResponse {
     status: {

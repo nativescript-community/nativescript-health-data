@@ -1,8 +1,8 @@
 import { Observable } from "tns-core-modules/data/observable";
 
 export interface ConfigurationData {
-    gfStartTimeInMillis: number;
-    gfEndTimeInMillis: number;
+    startDate: Date;
+    endDate: Date;
     gfBucketUnit: string;
     gfBucketSize: number;
     typeOfData: string;
@@ -11,7 +11,7 @@ export interface ConfigurationData {
 export interface ResponseItem {
     start: Date;
     end: Date;
-    value: number;
+    value: string;
 }
 
 export interface ResultResponse {

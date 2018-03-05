@@ -1,6 +1,6 @@
 {
     "name": "nativescript-health-data",
-    "version": "0.1.2",
+    "version": "0.1.6",
     "description": "Health Data plugin for Nativescript, using Google Fit and Apple Health Kit.",
     "main": "health-data",
     "typings": "index.d.ts",
@@ -24,7 +24,8 @@
         "clean": "rm -rf node_modules && cd ../demo && rm -rf hooks node_modules platforms && cd ../src && npm run plugin.link",
         "demo.ng.ios": "npm i && npm run tsc && cd ../demo-ng && tns run ios --syncAllFiles",
         "demo.ng.android": "npm i && npm run tsc && cd ../demo-ng && tns run android --syncAllFiles",
-        "plugin.ng.link": "npm link && cd ../demo-ng && npm link nativescript-health-data && cd ../src"
+        "plugin.ng.link": "npm link && cd ../demo-ng && npm link nativescript-health-data && cd ../src",
+        "plugin.linkc": "npm link && cd /Users/danielgek/spms/Ces && npm link nativescript-health-data && cd /Users/danielgek/WebProjects/nativescript-health-data/src"
     },
     "keywords": [
         "NativeScript",

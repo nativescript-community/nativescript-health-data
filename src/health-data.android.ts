@@ -6,136 +6,126 @@ import {
     ErrorResponse,
     createResultResponse,
     createErrorResponse
-} from "./health-data.common";
-import * as utils from "tns-core-modules/utils/utils";
-import * as application from "tns-core-modules/application";
-import * as platform from "tns-core-modules/platform";
+} from './health-data.common';
+import * as utils from 'tns-core-modules/utils/utils';
+import * as application from 'tns-core-modules/application';
+import * as platform from 'tns-core-modules/platform';
+
+const REQUEST_REQUIRED_PERMISSIONS = 1234;
+const REQUEST_CODE = 1;
+
+// android imports
+
+const ContextCompat = <any>android.support.v4.content.ContextCompat;
+const DataReadRequest  = com.google.android.gms.fitness.request.DataReadRequest;
+const DataType = com.google.android.gms.fitness.data.DataType;
+const Fitness = com.google.android.gms.fitness.Fitness;
+const GoogleApiAvailability = com.google.android.gms.common.GoogleApiAvailability;
+const GoogleApiClient = com.google.android.gms.common.api.GoogleApiClient;
+const HistoryApi = com.google.android.gms.fitness.Fitness.HistoryApi;
+const PackageManager = android.content.pm.PackageManager;
+const ResultCallback = com.google.android.gms.common.api.ResultCallback;
+const Scope = com.google.android.gms.common.api.Scope;
+const Scopes = com.google.android.gms.common.Scopes;
+const TimeUnit = java.util.concurrent.TimeUnit;
 
 
-let REQUEST_REQUIRED_PERMISSIONS = 1234;
-let REQUEST_CODE = 1;
 
 export class HealthData extends Common {
-    private mClient: any;
+    private mClient: com.google.android.gms.common.api.GoogleApiClient;
 
-    getCommonData(config: ConfigurationData) {
-        return new Promise<ResultResponse>((resolve, reject) => {
-            const action = "Getting Common Data";
-            if (this.mClient === null) {
-                reject(createErrorResponse(
-                    action,
-                    "You have to create your client first. Please, use createClient method first"
-                ));
-            } else if (!acceptableDataTypesForCommonity[config.typeOfData]) {
-                reject(createErrorResponse(
-                    action,
-                    "The dataType is not supported yet for both platforms. Use getAndroidData() method"
-                ));
-            } else if (!this.validateConfiguration(config)) {
-                reject(createErrorResponse(
-                    action,
-                    "Your configuration is not valid. Check the Dates"
-                ));
+    isAvailable(): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            // first check that the Google APIs are available
+            let gApi = GoogleApiAvailability.getInstance();
+            let apiResult = gApi.isGooglePlayServicesAvailable(
+                utils.ad.getApplicationContext()
+            );
+            if (
+                apiResult ===
+                com.google.android.gms.common.ConnectionResult.SUCCESS
+            ) {
+                // then check that Google Fit is actually installed
+                let pm = utils.ad
+                    .getApplicationContext()
+                    .getPackageManager() as android.content.pm.PackageManager;
+                try {
+                    pm.getPackageInfo(
+                        'com.google.android.apps.fitness',
+                        PackageManager.GET_ACTIVITIES
+                    );
+                    // Success return object
+                    resolve(true);
+                } catch (e) {
+                    console.log('Google fit is not intalled!');
+                    reject(false);
+                }
             } else {
-                this.getData(
-                    config,
-                    result => {
-                        resolve(createResultResponse(
-                            action,
-                            "success",
-                            config.typeOfData,
-                            result
-                        ));
-                    },
-                    error => {
-                        reject(createErrorResponse(action, error));
-                    }
-                );
+                console.log('aperantly you dont have google apis installed');
+                reject(false);
             }
         });
     }
 
-    getUncommonData(config: ConfigurationData) {
-        const action = "Getting Uncommon Data";
-        return new Promise<ResultResponse>((resolve, reject) => {
-            reject(createErrorResponse(action, "Method not yet supported in Android"));
-        });
-    }
-
-    private getData(
-        config: ConfigurationData,
-        successCallback,
-        failureCallback
-    ) {
-        this.queryFitnessData(config, result => {
-            if (typeof result === typeof []) {
-                successCallback(result);
-            } else {
-                failureCallback(result);
-            }
-        });
-    }
-
-    private queryFitnessData(config: ConfigurationData, fn) {
+    private queryFitnessData(config: ConfigurationData, callback: (result) => void) {
         // [START parse_read_data_result]
         // If the DataReadRequest object specified aggregated data, dataReadResult will be returned
         // as buckets containing DataSets, instead of just DataSets.
-        let readRequest = new com.google.android.gms.fitness.request.DataReadRequest.Builder();
+        let readRequest = new DataReadRequest.Builder();
         let typeOfData = acceptableDataTypesForCommonity[config.typeOfData];
         if (aggregatedDataTypes[typeOfData]) {
             readRequest = readRequest.aggregate(
-                com.google.android.gms.fitness.data.DataType[typeOfData],
+                DataType[typeOfData],
                 aggregatedDataTypes[typeOfData]
             );
             switch (config.gfBucketUnit) {
-                case "days":
+                case 'days':
                     readRequest = readRequest.bucketByTime(
                         config.gfBucketSize,
-                        java.util.concurrent.TimeUnit.DAYS
+                        TimeUnit.DAYS
                     );
                     break;
-                case "hours":
+                case 'hours':
                     readRequest = readRequest.bucketByTime(
                         config.gfBucketSize,
-                        java.util.concurrent.TimeUnit.HOURS
+                        TimeUnit.HOURS
                     );
                     break;
-                case "minutes":
+                case 'minutes':
                     readRequest = readRequest.bucketByTime(
                         config.gfBucketSize,
-                        java.util.concurrent.TimeUnit.MINUTES
+                        TimeUnit.MINUTES
                     );
                     break;
                 default:
                     readRequest = readRequest.bucketByTime(
                         config.gfBucketSize,
-                        java.util.concurrent.TimeUnit.DAYS
+                        TimeUnit.DAYS
                     );
                     break;
             }
         } else {
             readRequest = readRequest.read(
-                com.google.android.gms.fitness.data.DataType[typeOfData]
+                DataType[typeOfData]
             );
         }
 
         let dataReadRequest = readRequest
             .setTimeRange(
-                config.gfStartTimeInMillis,
-                config.gfEndTimeInMillis,
-                java.util.concurrent.TimeUnit.MILLISECONDS
+                config.startDate.getTime(),
+                config.endDate.getTime(),
+                TimeUnit.MILLISECONDS
             )
             .build();
 
-        let context = this;
         try {
-            let readResult = com.google.android.gms.fitness.Fitness.HistoryApi.readData(
+            let readResult = HistoryApi.readData(
                 this.mClient,
                 dataReadRequest
             ).setResultCallback(
-                new com.google.android.gms.common.api.ResultCallback({
-                    onResult: function(result) {
-                        fn(context.parseData(result as any));
+                new ResultCallback({
+                    onResult: (result) => {
+                        callback(this.parseData(result as any));
                     }
                 })
             );
@@ -144,7 +134,9 @@ export class HealthData extends Common {
         }
     }
 
-    private parseData(readResult: com.google.android.gms.fitness.result.DataReadResult) {
+    private parseData(
+        readResult: com.google.android.gms.fitness.result.DataReadResult
+    ) {
         let result = [];
         if (readResult.getBuckets().size() > 0) {
             for (
@@ -152,6 +144,7 @@ export class HealthData extends Common {
                 indexBucket < readResult.getBuckets().size();
                 indexBucket++
             ) {
+                // console.log(readResult.getBuckets().get(indexBucket));
                 let dataSets = readResult
                     .getBuckets()
                     .get(indexBucket)
@@ -184,15 +177,12 @@ export class HealthData extends Common {
         let result = [];
         let dateFormat = java.text.DateFormat.getTimeInstance();
         for (let index = 0; index < dataSet.getDataPoints().size(); index++) {
-            let prev = {};
             let pos = dataSet.getDataPoints().get(index);
-            // prev['type'] = pos.getDataType().getName();
-            prev["startTime"] = new Date(
-                pos.getStartTime(java.util.concurrent.TimeUnit.MILLISECONDS)
-            ).toString();
-            prev["endTime"] = new Date(
-                pos.getEndTime(java.util.concurrent.TimeUnit.MILLISECONDS)
-            ).toString();
+
+            // console.log('Data point: ');
+            // console.log('Type:' + pos.getDataType().getName());
+            // console.log('Start:' + new Date(pos.getStartTime(TimeUnit.MILLISECONDS)).toString());
+            // console.log('End:' + new Date(pos.getEndTime(TimeUnit.MILLISECONDS)).toString());
             for (
                 let indexField = 0;
                 indexField <
@@ -206,219 +196,205 @@ export class HealthData extends Common {
                     .getDataType()
                     .getFields()
                     .get(indexField);
-                prev[field.getName()] = pos.getValue(field).toString();
+
+                result.push({
+                    start: new Date(
+                        pos.getStartTime(
+                            TimeUnit.MILLISECONDS
+                        )
+                    ),
+                    end: new Date(
+                        pos.getEndTime(
+                            TimeUnit.MILLISECONDS
+                        )
+                    ),
+                    value: pos.getValue(field).toString()
+                });
+                // console.log('Field: ' + field.getName() + ' Value:' + pos.getValue(field));
             }
-            result.push(prev);
         }
         return result;
     }
+    isAuthorized(constToRead: string) {
 
-    private getPermissions(accesses: string[], fn) {
-        let currentContext = application.android.currentContext;
-        if (parseInt(platform.device.sdkVersion) >= 23) {
-            const contextCompat = <any>android.support.v4.content.ContextCompat;
-            const permissions = (<any>android).Manifest.permission;
-            const packageManager = android.content.pm.PackageManager;
-            if (
-                contextCompat.checkSelfPermission(
-                    currentContext,
-                    permissions[accesses[0]]
-                ) !== packageManager.PERMISSION_GRANTED ||
-                contextCompat.checkSelfPermission(
-                    currentContext,
-                    permissions[accesses[1]]
-                ) !== packageManager.PERMISSION_GRANTED ||
-                contextCompat.checkSelfPermission(
-                    currentContext,
-                    permissions[accesses[2]]
-                ) !== packageManager.PERMISSION_GRANTED
-            ) {
-                let activityRequestPermissionHandler = (
-                    args: application.AndroidActivityRequestPermissionsEventData
-                ) => {
-                    application.android.off(
+    }
+    requestAuthorization(accesses: string[]): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            const currentContext = application.android.currentContext;
+            if (parseInt(platform.device.sdkVersion) >= 23) {
+                const hasPremissions = accesses.reduce((acc, cur) => {
+                    if (!acc) {
+                        return acc;
+                    }
+                    if (
+                        ContextCompat.checkSelfPermission(currentContext, cur) !==
+                        PackageManager.PERMISSION_GRANTED
+                    ) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }, true);
+                if (hasPremissions) {
+                    let activityRequestPermissionHandler = (
+                        args: application.AndroidActivityRequestPermissionsEventData
+                    ) => {
+                        application.android.off(
+                            application.AndroidApplication.activityRequestPermissionsEvent,
+                            activityRequestPermissionHandler
+                        );
+                        if (
+                            args.requestCode === REQUEST_REQUIRED_PERMISSIONS &&
+                            args.grantResults.length > 0 &&
+                            args.grantResults[0] ===
+                                PackageManager.PERMISSION_GRANTED &&
+                            args.grantResults[1] ===
+                                PackageManager.PERMISSION_GRANTED &&
+                            args.grantResults[2] ===
+                                PackageManager.PERMISSION_GRANTED
+                        ) {
+                            resolve(true);
+                        } else {
+                            reject(false);
+                        }
+                    };
+                    application.android.on(
                         application.AndroidApplication
                             .activityRequestPermissionsEvent,
                         activityRequestPermissionHandler
                     );
-                    if (
-                        args.requestCode === REQUEST_REQUIRED_PERMISSIONS &&
-                        args.grantResults.length > 0 &&
-                        args.grantResults[0] ===
-                            packageManager.PERMISSION_GRANTED &&
-                        args.grantResults[1] ===
-                            packageManager.PERMISSION_GRANTED &&
-                        args.grantResults[2] ===
-                            packageManager.PERMISSION_GRANTED
-                    ) {
-                        fn(true);
-                    } else {
-                        fn(false);
-                    }
-                };
-                application.android.on(
-                    application.AndroidApplication
-                        .activityRequestPermissionsEvent,
-                    activityRequestPermissionHandler
-                );
-                (<any>android.support.v4.app).ActivityCompat.requestPermissions(
-                    application.android.currentContext,
-                    [
-                        "android.permission." + accesses[0],
-                        "android.permission." + accesses[1],
-                        "android.permission." + accesses[2]
-                    ],
-                    REQUEST_REQUIRED_PERMISSIONS
-                );
+                    (<any>android.support.v4.app).ActivityCompat.requestPermissions(
+                        application.android.currentContext,
+                        [
+                            'android.permission.' + accesses[0],
+                            'android.permission.' + accesses[1],
+                            'android.permission.' + accesses[2]
+                        ],
+                        REQUEST_REQUIRED_PERMISSIONS
+                    );
+                } else {
+                    resolve(true);
+                }
             } else {
-                fn(true);
+                resolve(true);
             }
-        } else {
-            fn(true);
-        }
+        });
     }
 
-    createClient() {
-        let context = this;
-        const action = "Creating Client";
+    private connect(): Promise<ResultResponse> {
+        const action = 'Creating Client';
         return new Promise((resolve, reject) => {
-            let mClient = new com.google.android.gms.common.api.GoogleApiClient.Builder(
-                application.android.currentContext
-            )
-                .addApi(com.google.android.gms.fitness.Fitness.HISTORY_API)
-                .addScope(
-                    new com.google.android.gms.common.api.Scope(
-                        com.google.android.gms.common.Scopes.FITNESS_ACTIVITY_READ
-                    )
-                )
-                .addScope(
-                    new com.google.android.gms.common.api.Scope(
-                        com.google.android.gms.common.Scopes.FITNESS_BODY_READ
-                    )
-                )
-                .addScope(
-                    new com.google.android.gms.common.api.Scope(
-                        com.google.android.gms.common.Scopes.FITNESS_LOCATION_READ
-                    )
-                )
-                .addScope(
-                    new com.google.android.gms.common.api.Scope(
-                        com.google.android.gms.common.Scopes.FITNESS_NUTRITION_READ
-                    )
-                )
-                .addConnectionCallbacks(
-                    new com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks(
-                        {
-                            onConnected: function(Bundle: android.os.Bundle) {
-                                const response: ResultResponse = createResultResponse(
-                                    action, "Google Play services connected successfully"
-                                );
-                                context.mClient = mClient;
-                                resolve(response);
-                            },
-                            onConnectionSuspended: function(i: number) {
-                                if (
-                                    i ===
-                                    com.google.android.gms.common.api
-                                        .GoogleApiClient.ConnectionCallbacks
-                                        .CAUSE_NETWORK_LOST
-                                ) {
-                                    console.log(
-                                        "Connection Lost, Network Lost"
-                                    );
-                                } else {
-                                    console.log(
-                                        "Connection lost, Service Disconnected"
-                                    );
-                                }
-                            }
+            let mClient = new GoogleApiClient.Builder(application.android.currentContext)
+                .addApi(Fitness.HISTORY_API)
+                .addApi(Fitness.SESSIONS_API)
+                .addApi(Fitness.RECORDING_API)
+                .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ))
+                .addScope(new Scope(Scopes.FITNESS_BODY_READ))
+                .addScope(new Scope(Scopes.FITNESS_LOCATION_READ))
+                .addScope(new Scope(Scopes.FITNESS_NUTRITION_READ))
+                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks({
+                    onConnected: (Bundle: android.os.Bundle) => {
+                        const response = createResultResponse(
+                            action,
+                            'Google Play services connected successfully'
+                        );
+                        this.mClient = mClient;
+                        resolve(response);
+                    },
+                    onConnectionSuspended: (i: number) => {
+                        if (
+                            i ===
+                            GoogleApiClient
+                                .ConnectionCallbacks
+                                .CAUSE_NETWORK_LOST
+                        ) {
+                            console.log(
+                                'Connection Lost, Network Lost'
+                            );
+                        } else {
+                            console.log(
+                                'Connection lost, Service Disconnected'
+                            );
                         }
-                    )
-                )
-                .addOnConnectionFailedListener(
-                    new com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener(
-                        {
-                            onConnectionFailed: function(result: any) {
-                                console.log(
-                                    "Google Play services connection failed"
-                                );
-                                console.dir(result);
-                                if (result.hasResolution()) {
-                                    context.getPermissions(
-                                        [
-                                            "GET_ACCOUNTS",
-                                            "ACCESS_FINE_LOCATION",
-                                            "BODY_SENSORS"
-                                        ],
-                                        resultPermissions => {
-                                            if (resultPermissions) {
-                                                result.startResolutionForResult(
-                                                    application.android
-                                                        .foregroundActivity,
-                                                    REQUEST_CODE
-                                                );
-                                            } else {
-                                                context.mClient = null;
-                                                reject(createErrorResponse(
-                                                    action, "Google Play services connection failed. You have not system permissions to connect to Google Play Services"
-                                                ));
-                                            }
-                                        }
-                                    );
-                                } else {
-                                    context.mClient = null;
-                                    reject(createErrorResponse(
-                                        action,
-                                        "Cannot connect to your Google Account"
-                                    ));
-                                }
-                            }
+                    }
+                })
+            ).addOnConnectionFailedListener(
+                new GoogleApiClient.OnConnectionFailedListener({
+                    onConnectionFailed: (result: com.google.android.gms.common.ConnectionResult) => {
+                        console.log(
+                            'Google Play services connection failed'
+                        );
+                        console.log(result.getErrorMessage());
+                        if (result.hasResolution()) {
+                            console.log('But wait there is a possible resolution, let me try!');
+                            this.requestAuthorization(
+                                [
+                                    'GET_ACCOUNTS',
+                                    'ACCESS_FINE_LOCATION',
+                                    'BODY_SENSORS'
+                                ])
+                                .then(resultPermissions => {
+                                    if (resultPermissions) {
+                                        result.startResolutionForResult(
+                                            application.android
+                                                .foregroundActivity,
+                                            REQUEST_CODE
+                                        );
+                                    } else {
+                                        this.mClient = null;
+                                        reject(
+                                            createErrorResponse(
+                                                action,
+                                                'Google Play services connection failed. You have not system permissions to connect to Google Play Services'
+                                            )
+                                        );
+                                    }
+                                });
+                        } else {
+                            this.mClient = null;
+                            reject(
+                                createErrorResponse(
+                                    action,
+                                    'Cannot connect to your Google Account'
+                                )
+                            );
                         }
-                    )
-                )
-                .build();
+                    }
+                })
+            ).build();
             mClient.connect();
         });
     }
 
     private validateConfiguration(config: ConfigurationData) {
-        return config.gfEndTimeInMillis > config.gfStartTimeInMillis;
+        return config.endDate > config.startDate;
     }
 
     constructor() {
         super();
-        this.hasPermissions = false;
         this.mClient = null;
     }
 }
 
 export const aggregatedDataTypes = {
-    TYPE_STEP_COUNT_DELTA:
-        com.google.android.gms.fitness.data.DataType.AGGREGATE_STEP_COUNT_DELTA,
-    TYPE_DISTANCE_DELTA:
-        com.google.android.gms.fitness.data.DataType.AGGREGATE_DISTANCE_DELTA,
-    TYPE_CALORIES_EXPENDED:
-        com.google.android.gms.fitness.data.DataType
-            .AGGREGATE_CALORIES_EXPENDED,
-    // "TYPE_HEIGHT": com.google.android.gms.fitness.data.DataType.AGGREGATE_HEIGHT_SUMMARY,
-    TYPE_WEIGHT:
-        com.google.android.gms.fitness.data.DataType.AGGREGATE_WEIGHT_SUMMARY,
-    // "TYPE_HEART_RATE_BPM": com.google.android.gms.fitness.data.DataType.AGGREGATE_HEART_RATE_SUMMARY,
-    TYPE_BODY_FAT_PERCENTAGE:
-        com.google.android.gms.fitness.data.DataType
-            .AGGREGATE_BODY_FAT_PERCENTAGE_SUMMARY,
-    TYPE_NUTRITION:
-        com.google.android.gms.fitness.data.DataType.AGGREGATE_NUTRITION_SUMMARY
+    TYPE_STEP_COUNT_DELTA: DataType.AGGREGATE_STEP_COUNT_DELTA,
+    TYPE_DISTANCE_DELTA: DataType.AGGREGATE_DISTANCE_DELTA,
+    TYPE_CALORIES_EXPENDED: DataType.AGGREGATE_CALORIES_EXPENDED,
+    // "TYPE_HEIGHT": DataType.AGGREGATE_HEIGHT_SUMMARY,
+    TYPE_WEIGHT: DataType.AGGREGATE_WEIGHT_SUMMARY,
+    // "TYPE_HEART_RATE_BPM": DataType.AGGREGATE_HEART_RATE_SUMMARY,
+    TYPE_BODY_FAT_PERCENTAGE: DataType.AGGREGATE_BODY_FAT_PERCENTAGE_SUMMARY,
+    TYPE_NUTRITION: DataType.AGGREGATE_NUTRITION_SUMMARY
 };
 
 export const acceptableDataTypesForCommonity = {
-    steps: "TYPE_STEP_COUNT_DELTA",
-    distance: "TYPE_DISTANCE_DELTA",
-    calories: "TYPE_CALORIES_EXPENDED",
-    // "activity": com.google.android.gms.fitness.data.DataType.TYPE_ACTIVITY_SEGMENT,
-    height: "TYPE_HEIGHT",
-    weight: "TYPE_WEIGHT",
-    heartRate: "TYPE_HEART_RATE_BPM",
-    fatPercentage: "TYPE_BODY_FAT_PERCENTAGE"
+    steps: 'TYPE_STEP_COUNT_DELTA',
+    distance: 'TYPE_DISTANCE_DELTA',
+    calories: 'TYPE_CALORIES_EXPENDED',
+    // "activity": DataType.TYPE_ACTIVITY_SEGMENT,
+    height: 'TYPE_HEIGHT',
+    weight: 'TYPE_WEIGHT',
+    heartRate: 'TYPE_HEART_RATE_BPM',
+    fatPercentage: 'TYPE_BODY_FAT_PERCENTAGE'
     // "nutrition": "TYPE_NUTRITION",
 };

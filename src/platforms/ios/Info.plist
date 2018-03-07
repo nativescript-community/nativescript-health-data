@@ -2,11 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<!--Describe the permissions, features or other configurations required by your plugin for iOS.-->
 	<key>NSHealthShareUsageDescription</key>
 	<string>HealthKit Share Usage Description</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>HealthKit Update Usage Description</string>
-
 </dict>
 </plist>

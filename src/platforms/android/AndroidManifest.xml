@@ -1,17 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
-	<!--Describe the permissions, features or other configurations required by your plugin for Android. 
-		To read more about android permissions go to https://developer.android.com/guide/topics/permissions/index.html -->
-	<!--EXAMPLE: uses-permission android:name="android.permission.INTERNET"/> -->
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.GET_ACCOUNTS" />
 	<uses-permission android:name="android.permission.BODY_SENSORS" />
-
-	
-	<!-- <application>
-		 <meta-data android:name="com.google.android.gms.version" 
-    		android:value="@integer/google_play_services_version" /> 
-	</application> -->
 </manifest>

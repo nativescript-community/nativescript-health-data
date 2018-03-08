@@ -6,6 +6,10 @@ export interface ConfigurationData {
     gfBucketSize: number;
     typeOfData: string;
 }
+export interface HealthDataType {
+    name: string;
+    accessType: "read" | "write" | "readAndWrite";
+}
 export declare type AggregateBy = "hour" | "day" | "sourceAndDay";
 export interface QueryRequest {
     startDate: Date;

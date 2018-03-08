@@ -1,6 +1,6 @@
-import { AggregateBy, Common, HealthDataType, QueryRequest, ResponseItem } from './health-data.common';
+import { AggregateBy, Common, HealthDataApi, HealthDataType, QueryRequest, ResponseItem } from './health-data.common';
 
-export class HealthData extends Common {
+export class HealthData extends Common implements HealthDataApi {
   healthStore: HKHealthStore;
 
   constructor() {

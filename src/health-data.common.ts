@@ -1,5 +1,3 @@
-import { Observable } from "tns-core-modules/data/observable";
-
 export interface ConfigurationData {
   startDate: Date;
   endDate: Date;
@@ -60,14 +58,17 @@ export function createErrorResponse(action: string, description: string): ErrorR
   return {action, description};
 }
 
-export class Common extends Observable {
-  public hasPermissions: boolean;
-  public result: string;
+export interface HealthDataApi {
+  isAvailable(): Promise<boolean>;
 
-  constructor() {
-    super();
-  }
+  isAuthorized(types: Array<HealthDataType>): Promise<boolean>;
 
+  requestAuthorization(types: Array<HealthDataType>): Promise<boolean>;
+
+  query(opts: QueryRequest): Promise<any>;
+}
+
+export abstract class Common {
   protected aggregate(parsedData: Array<ResponseItem>, aggregateBy?: AggregateBy): Array<ResponseItem> {
     if (aggregateBy) {
       let result: Array<ResponseItem> = [];

@@ -1,7 +1,6 @@
 import { Component } from "@angular/core";
-import { AggregateBy, HealthData } from "nativescript-health-data";
 import { alert } from "tns-core-modules/ui/dialogs";
-import { HealthDataType } from "../../src";
+import { AggregateBy, HealthData, HealthDataType } from "nativescript-health-data";
 
 @Component({
   selector: "ns-app",

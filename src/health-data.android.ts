@@ -1,8 +1,8 @@
 /// <reference path="./android.def.d.ts" />
-import { AggregateBy, Common, HealthDataType, QueryRequest, ResponseItem } from './health-data.common';
+import { AggregateBy, Common, HealthDataApi, HealthDataType, QueryRequest, ResponseItem } from './health-data.common';
 import * as utils from 'tns-core-modules/utils/utils';
+import { ad } from 'tns-core-modules/utils/utils';
 import * as application from 'tns-core-modules/application';
-import { ad } from "tns-core-modules/utils/utils";
 import getApplicationContext = ad.getApplicationContext;
 
 const GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 2;
@@ -18,7 +18,7 @@ const TimeUnit = java.util.concurrent.TimeUnit;
 const FitnessOptions = com.google.android.gms.fitness.FitnessOptions;
 const GoogleSignIn = com.google.android.gms.auth.api.signin.GoogleSignIn;
 
-export class HealthData extends Common {
+export class HealthData extends Common implements HealthDataApi {
   isAvailable(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       const gApi = GoogleApiAvailability.getInstance();

@@ -20,88 +20,82 @@ keytool -exportcert -keystore ~/.android/<debug or production>.keystore -list -v
 
 ## Installation
 
-Install the plugin using the NativeScript CLI tooling
+Install the plugin using the NativeScript CLI
 
 ```
 tns plugin add nativescript-health-data
 ```
 
-## Usage 
-The examples below are presented in Typescript, such that this [demo](https://github.com/filipemendes1994/nativescript-health-data/tree/master/demo-ng) was developed in Nativescript w/ Angular sample project. So, start for import what matters to you.
+## API 
+The examples below are all in TypeScript, and the [demo](https://github.com/EddyVerbruggen/nativescript-health-data/tree/master/demo-ng) was developed in Nativescript w/ Angular.
 
-```
-import { HealthData } from "nativescript-health-data";
-``` 
-
-### Create HealthData Client
-Before you can grab any kind of user info, you must initialize a client object. Otherwise, you will always get an error response.
+This is how you can import and instantiate the plugin, all examples expect this setup:
 
 ```typescript
-import { HealthData } from "nativescript-health-data";
-let healthData = new HealthData();
-healthData.createClient()
-	.then((fulfilled) => {
-    	console.log(fulfilled);
-    }).catch((error) => {
-    	console.log(error);
-    });
-```
+import { AggregateBy, HealthData, HealthDataType } from "nativescript-health-data";
 
-### Get Data
-To collect the user data, simply apply this little snippet.
+export class MyHealthyClass {
+  private healthData: HealthData;
 
-```typescript
-healthData.getCommonData(configData)
-	.then((fulfilled) => {
-    	console.log(fulfilled);
-    }).catch((error) => {
-        console.log(error);
-    });
-```
-
-### Configuration Object
-Like you can see, the ```getCommonData(configObj)``` method receives a configuration object, something like this one above.
-
-```typescript
-interface ConfigurationData {
-  gfStartTimeInMillis: number,
-  gfEndTimeInMillis: number,
-  gfBucketUnit: string, 
-  gfBucketSize: number,
-  typeOfData: string
-}
-```
-*Note*: The *gf* prefix attributes are exclusive configurations to Google Fit.
-
-### Success and Error Response Messages
-From any API endpoint, you will receive one of these 2 objects. In success case, you will receive this:
-
-```typescript
-interface ResultResponse {
-    status: {
-        action: string;
-        message: string;
-    };
-    data: {
-        type: string;
-        response: Array<ResponseItem>;
-    };
+  constructor() {
+    this.healthData = new HealthData();
+  }
 }
 
-interface ResponseItem {
-    start: Date;
-    end: Date;
-    value: string;
-}
 ```
-In error case, you will receive this one:
+
+### `isAvailable`
+This function does not return a Promise; it resolves immediately, and tells you whether or not the device supports Health Data. On iOS this is probably always `true`. On Android the user will be prompted to (automatically) update their Play Services version in case it's not sufficiently up to date.
+
+```typescript 
+const isAvailable = this.healthData.isAvailable();
+```
+
+### `isAuthorized`
+This function (and the next one) takes an `Array` of `HealthDataType`'s. Each of those has a `name` and an `accessType`.
+
+- The `name` can be one of `steps`, .. TODO
+- The accessType can be one of `read`, `write`, or `readAndWrite`.
 
 ```typescript
-interface ErrorResponse {
-    action: string;
-    description: string;
-}
+this.healthData.isAuthorized([<HealthDataType>{name: "steps", accessType: "read"}])
+    .then(authorized => console.log(authorized);
 ```
+
+### `requestAuthorization`
+This function takes the same argument as `isAuthorized`, and will trigger a consent screen in case the user hasn't previously authorized your app to access any of the passed `HealthDataType`'s.
+
+```typescript
+const types: Array<HealthDataType> = [
+	{name: "height", accessType: "write"},
+	{name: "weight", accessType: "readAndWrite"},
+	{name: "steps", accessType: "read"},
+	{name: "distance", accessType: "read"}
+];
+
+this.healthData.requestAuthorization(types)
+    .then(authorized => console.log(authorized)
+    .catch(error => console.log("Request auth error: ", error));
+```
+
+### `query`
+dsdasd
+
+```typescript
+this.healthData.query(
+    {
+      startDate: new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+      endDate: new Date(), // now
+      dataType: "steps", // equal to the 'name' property of 'HealthDataType'
+      unit: "count", // make sure this is compatible with the 'dataType' (see below)
+      aggregateBy: "day" // optional, one of: "hour", "day", "sourceAndDay"
+    })
+    .then(result => console.log(JSON.stringify(result)))
+    .catch(error => this.resultToShow = error);
+```
+
+
+TODO below
 
 ## Available Data Types
 Unfortunatelly, this plugin is in the beginning. So, the capabilities are the possibles, for now.

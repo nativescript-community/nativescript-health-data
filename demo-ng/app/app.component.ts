@@ -15,7 +15,7 @@ export class AppComponent {
     {name: "distance", accessType: "read"}
   ];
 
-  healthData: HealthData;
+  private healthData: HealthData;
   resultToShow = "";
 
   constructor() {

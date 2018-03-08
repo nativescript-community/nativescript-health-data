@@ -3,7 +3,7 @@ import { Common, QueryRequest, ResponseItem } from './health-data.common';
 import * as utils from 'tns-core-modules/utils/utils';
 import * as application from 'tns-core-modules/application';
 
-const GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 1;
+const GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 2;
 
 declare const com: any;
 
@@ -12,7 +12,6 @@ const DataReadRequest = com.google.android.gms.fitness.request.DataReadRequest;
 const DataType = com.google.android.gms.fitness.data.DataType;
 const Fitness = com.google.android.gms.fitness.Fitness;
 const GoogleApiAvailability = com.google.android.gms.common.GoogleApiAvailability;
-const PackageManager = android.content.pm.PackageManager;
 const TimeUnit = java.util.concurrent.TimeUnit;
 const FitnessOptions = com.google.android.gms.fitness.FitnessOptions;
 const GoogleSignIn = com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -20,24 +19,16 @@ const GoogleSignIn = com.google.android.gms.auth.api.signin.GoogleSignIn;
 export class HealthData extends Common {
   isAvailable(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
-      // first check that the Google APIs are available
-      let gApi = GoogleApiAvailability.getInstance();
-      let apiResult = gApi.isGooglePlayServicesAvailable(utils.ad.getApplicationContext());
-      if (apiResult === com.google.android.gms.common.ConnectionResult.SUCCESS) {
-        // TODO this is actually not relevant:
-        // then check that Google Fit is actually installed
-        let pm = utils.ad.getApplicationContext().getPackageManager() as android.content.pm.PackageManager;
-        try {
-          pm.getPackageInfo('com.google.android.apps.fitness', PackageManager.GET_ACTIVITIES);
-          resolve(true);
-        } catch (e) {
-          console.log('Google fit is not intalled!');
-          resolve(false);
-        }
-      } else {
-        console.log("apparently you don't have Google apis installed");
-        resolve(false);
+      const gApi = GoogleApiAvailability.getInstance();
+      const apiResult = gApi.isGooglePlayServicesAvailable(utils.ad.getApplicationContext());
+      const available = apiResult === com.google.android.gms.common.ConnectionResult.SUCCESS;
+      if (!available && gApi.isUserResolvableError(apiResult)) {
+        // show a dialog offering the user to update (no need to wait for it to finish)
+        gApi.showErrorDialogFragment(application.android.foregroundActivity, apiResult, 1, new android.content.DialogInterface.OnCancelListener({
+          onCancel: dialogInterface => console.log("Google Play Services update dialog was canceled")
+        }));
       }
+      resolve(available);
     });
   }
 
@@ -69,13 +60,11 @@ export class HealthData extends Common {
             }))
             .addOnCompleteListener(new com.google.android.gms.tasks.OnCompleteListener({
               onComplete: (task: any) => {
-                console.log(">>>>> read complete");
+                // noop
               }
             }));
       } catch (e) {
-        console.log(">>>>> quering, error: " + e);
         reject(e);
-        return;
       }
     });
   }

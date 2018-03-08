@@ -1,6 +1,7 @@
 import { Component } from "@angular/core";
 import { AggregateBy, HealthData } from "nativescript-health-data";
 import { alert } from "tns-core-modules/ui/dialogs";
+import { HealthDataType } from "../../src";
 
 @Component({
   selector: "ns-app",
@@ -8,7 +9,12 @@ import { alert } from "tns-core-modules/ui/dialogs";
 })
 
 export class AppComponent {
-  private static TYPES = ["height", "weight", "steps", "distance"];
+  private static TYPES: Array<HealthDataType> = [
+    {name: "height", accessType: "write"},
+    {name: "weight", accessType: "readAndWrite"},
+    {name: "steps", accessType: "read"},
+    {name: "distance", accessType: "read"}
+  ];
 
   healthData: HealthData;
   resultToShow = "";
@@ -22,15 +28,15 @@ export class AppComponent {
   }
 
   isAuthorized(): void {
-    this.healthData.isAuthorized("weight")
-        .then(authorized => this.resultToShow = (authorized ? "" : "Not ") + "authorized for " + AppComponent.TYPES);
+    this.healthData.isAuthorized([<HealthDataType>{name: "weight", accessType: "read"}])
+        .then(authorized => this.resultToShow = (authorized ? "" : "Not ") + "authorized for " + JSON.stringify(AppComponent.TYPES));
   }
 
   requestAuthForVariousTypes(): void {
     this.healthData.requestAuthorization(AppComponent.TYPES)
-        .then(authenticated => setTimeout(() => alert({
+        .then(authorized => setTimeout(() => alert({
           title: "Authentication result",
-          message: "" + authenticated,
+          message: (authorized ? "" : "Not ") + "authorized for " + JSON.stringify(AppComponent.TYPES),
           okButtonText: "Ok!"
         }), 300))
         .catch(error => console.log("Request auth error: ", error));

@@ -1,14 +1,20 @@
 import { Common, QueryRequest } from './health-data.common';
-export declare const QuantityTypeNeeded = "quantity_type_needed";
-export declare const CharacteristicTypeNeeded = "characteristic_type_needed";
-export declare const CategoryTypeNeeded = "category_type_needed";
-export declare const QuantityResultNeeded = "quantity_result_needed";
-export declare const CategoryResultNeeded = "category_result_needed";
+// export declare const QuantityTypeNeeded = "quantity_type_needed";
+// export declare const CharacteristicTypeNeeded = "characteristic_type_needed";
+// export declare const CategoryTypeNeeded = "category_type_needed";
+// export declare const QuantityResultNeeded = "quantity_result_needed";
+// export declare const CategoryResultNeeded = "category_result_needed";
 export type AggregateBy = "hour" | "day" | "sourceAndDay";
+
+export interface HealthDataType {
+    name: string;
+    accessType: "read" | "write" | "readAndWrite"
+}
+
 export declare class HealthData extends Common {
     isAvailable(): boolean;
-    isAuthorized(type: string | string[]): Promise<boolean>;
-    requestAuthorization(type: string | string[]): Promise<boolean>;
+    isAuthorized(type: Array<HealthDataType>): Promise<boolean>;
+    requestAuthorization(type: Array<HealthDataType>): Promise<boolean>;
     query(opts: QueryRequest): Promise<any>;
     // queryAggregated(opts, onSuccess, onError)
     // store(data, onSuccess, onError);
@@ -29,6 +35,7 @@ export declare class HealthData extends Common {
     // private convertToCategoryIdentifier(data);
 }
 
+/*
 export declare const quantityTypes: {
     "appleExerciseTime": string;
     "basalBodyTemperature": string;
@@ -122,3 +129,4 @@ export declare const categoryTypes: {
     "sexualActivity": string;
     "sleepAnalysis": string;
 };
+*/

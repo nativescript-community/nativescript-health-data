@@ -1,5 +1,5 @@
 /// <reference path="./android.def.d.ts" />
-import { AggregateBy, Common, QueryRequest, ResponseItem } from './health-data.common';
+import { AggregateBy, Common, HealthDataType, QueryRequest, ResponseItem } from './health-data.common';
 import * as utils from 'tns-core-modules/utils/utils';
 import * as application from 'tns-core-modules/application';
 import { ad } from "tns-core-modules/utils/utils";
@@ -34,15 +34,14 @@ export class HealthData extends Common {
     });
   }
 
-  isAuthorized(type: string | string[]): Promise<boolean> {
+  isAuthorized(types: Array<HealthDataType>): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       const fitnessOptionsBuilder = FitnessOptions.builder();
 
-      if (typeof(type) === "string") {
-        fitnessOptionsBuilder.addDataType(this.getDataType(type), FitnessOptions.ACCESS_READ)
-      } else {
-        type.forEach(t => fitnessOptionsBuilder.addDataType(this.getDataType(t), FitnessOptions.ACCESS_READ));
-      }
+      types.filter(t => t.accessType === "read" || t.accessType === "readAndWrite")
+          .forEach(t => fitnessOptionsBuilder.addDataType(this.getDataType(t.name), FitnessOptions.ACCESS_READ));
+      types.filter(t => t.accessType === "write" || t.accessType === "readAndWrite")
+          .forEach(t => fitnessOptionsBuilder.addDataType(this.getDataType(t.name), FitnessOptions.ACCESS_WRITE));
 
       resolve(GoogleSignIn.hasPermissions(
           GoogleSignIn.getLastSignedInAccount(application.android.currentContext),
@@ -50,16 +49,14 @@ export class HealthData extends Common {
     });
   }
 
-  // TODO, for writing: [{ name: string, readOnly: boolean }]
-  requestAuthorization(type: string | string[]): Promise<boolean> {
+  requestAuthorization(types: Array<HealthDataType>): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       const fitnessOptionsBuilder = FitnessOptions.builder();
 
-      if (typeof(type) === "string") {
-        fitnessOptionsBuilder.addDataType(this.getDataType(type), FitnessOptions.ACCESS_READ)
-      } else {
-        type.forEach(t => fitnessOptionsBuilder.addDataType(this.getDataType(t), FitnessOptions.ACCESS_READ));
-      }
+      types.filter(t => t.accessType === "read" || t.accessType === "readAndWrite")
+          .forEach(t => fitnessOptionsBuilder.addDataType(this.getDataType(t.name), FitnessOptions.ACCESS_READ));
+      types.filter(t => t.accessType === "write" || t.accessType === "readAndWrite")
+          .forEach(t => fitnessOptionsBuilder.addDataType(this.getDataType(t.name), FitnessOptions.ACCESS_WRITE));
 
       const fitnessOptions = fitnessOptionsBuilder.build();
 

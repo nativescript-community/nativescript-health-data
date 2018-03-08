@@ -1,4 +1,4 @@
-import { AggregateBy, Common, QueryRequest, ResponseItem } from './health-data.common';
+import { AggregateBy, Common, HealthDataType, QueryRequest, ResponseItem } from './health-data.common';
 
 export class HealthData extends Common {
   healthStore: HKHealthStore;
@@ -16,55 +16,44 @@ export class HealthData extends Common {
     });
   }
 
-  isAuthorized(type: string | string[]): Promise<boolean> {
+  isAuthorized(types: Array<HealthDataType>): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       if (this.healthStore === undefined) {
         reject("Health not available");
         return;
       }
 
-      if (typeof(type) === "string") {
-        const authStatus = this.healthStore.authorizationStatusForType(this.resolveDataType(acceptableDataTypes[type]));
-        console.log(">>>> authStatus: " + authStatus);
-        resolve(authStatus === HKAuthorizationStatus.SharingAuthorized);
-      } else {
-        let authorized = true;
-        type.forEach(t => {
-          authorized = authorized &&
-              this.healthStore.authorizationStatusForType(this.resolveDataType(acceptableDataTypes[t])) === HKAuthorizationStatus.SharingAuthorized;
-        });
-        resolve(authorized);
-      }
+      let authorized = true;
+      types.forEach(t => {
+        authorized = authorized &&
+            this.healthStore.authorizationStatusForType(this.resolveDataType(acceptableDataTypes[t.name])) === HKAuthorizationStatus.SharingAuthorized;
+      });
+      resolve(authorized);
     });
   }
 
-  requestAuthorization(constToRead: string | string[]): Promise<boolean> {
+  requestAuthorization(types: Array<HealthDataType>): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       if (this.healthStore === undefined) {
         reject("Health not available");
         return;
       }
 
-      let dataToAccess;
-      let readDataTypes;
-      if (typeof constToRead === "string") {
-        dataToAccess = this.resolveDataType(acceptableDataTypes[constToRead]);
-        readDataTypes = NSSet.setWithObject<HKObjectType>(dataToAccess);
-      } else {
-        readDataTypes = NSMutableSet.alloc<HKObjectType>().init();
-        constToRead.forEach(c => readDataTypes.addObject(this.resolveDataType(acceptableDataTypes[c])));
-      }
+      let readDataTypes = NSMutableSet.alloc<HKObjectType>().init();
+      let writeDataTypes = NSMutableSet.alloc<HKObjectType>().init();
+      types.filter(t => t.accessType === "read" || t.accessType === "readAndWrite")
+          .forEach(t => readDataTypes.addObject(this.resolveDataType(acceptableDataTypes[t.name])));
+      types.filter(t => t.accessType === "write" || t.accessType === "readAndWrite")
+          .forEach(t => writeDataTypes.addObject(this.resolveDataType(acceptableDataTypes[t.name])));
 
       this.healthStore.requestAuthorizationToShareTypesReadTypesCompletion(
-          null,
+          writeDataTypes,
           readDataTypes,
           (success, error) => {
             if (success) {
               resolve(true);
             } else {
-              reject(
-                  'You do not have permissions for requested data type'
-              );
+              reject('You do not have permissions for requested data type');
             }
           }
       );
@@ -90,15 +79,15 @@ export class HealthData extends Common {
     });
   }
 
-  private resolveDataType(constToRead: string): HKObjectType {
-    if (quantityTypes[constToRead]) {
-      return HKObjectType.quantityTypeForIdentifier(quantityTypes[constToRead]);
-    } else if (characteristicTypes[constToRead]) {
-      return HKObjectType.characteristicTypeForIdentifier(characteristicTypes[constToRead]);
-    } else if (categoryTypes[constToRead]) {
-      return HKObjectType.categoryTypeForIdentifier(categoryTypes[constToRead]);
+  private resolveDataType(type: string): HKObjectType {
+    if (quantityTypes[type]) {
+      return HKObjectType.quantityTypeForIdentifier(quantityTypes[type]);
+    } else if (characteristicTypes[type]) {
+      return HKObjectType.characteristicTypeForIdentifier(characteristicTypes[type]);
+    } else if (categoryTypes[type]) {
+      return HKObjectType.categoryTypeForIdentifier(categoryTypes[type]);
     } else {
-      console.log("Constant not supported: " + constToRead);
+      console.log("Constant not supported: " + type);
       return null;
     }
   }

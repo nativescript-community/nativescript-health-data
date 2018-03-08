@@ -8,6 +8,11 @@ export interface ConfigurationData {
   typeOfData: string;
 }
 
+export interface HealthDataType {
+  name: string;
+  accessType: "read" | "write" | "readAndWrite"
+}
+
 export type AggregateBy = "hour" | "day" | "sourceAndDay";
 
 export interface QueryRequest {

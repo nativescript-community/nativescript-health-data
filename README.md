@@ -1,5 +1,17 @@
-# Health Data for NativeScript
-## A cross platform (iOS & Android) plugin 
+# Health Data plugin for NativeScript
+
+[![Build Status][build-status]][build-url]
+[![NPM version][npm-image]][npm-url]
+[![Downloads][downloads-image]][npm-url]
+[![Twitter Follow][twitter-image]][twitter-url]
+
+[build-status]:https://travis-ci.org/EddyVerbruggen/nativescript-health-data.svg?branch=master
+[build-url]:https://travis-ci.org/EddyVerbruggen/nativescript-health-data
+[npm-image]:http://img.shields.io/npm/v/nativescript-health-data.svg
+[npm-url]:https://npmjs.org/package/nativescript-health-data
+[downloads-image]:http://img.shields.io/npm/dm/nativescript-health-data.svg
+[twitter-image]:https://img.shields.io/twitter/follow/eddyverbruggen.svg?style=social&label=Follow%20me
+[twitter-url]:https://twitter.com/eddyverbruggen
 
 ### Description
 This is a NativeScript plugin that abstracts Apple HealthKit and Google Fit repositories to collect health data from user's smartphone. Unfortunately, I am a starter in NativeScript's plugins development so, because of that, not every data type is available right now.

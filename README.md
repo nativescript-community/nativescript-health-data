@@ -14,9 +14,7 @@
 [twitter-url]:https://twitter.com/eddyverbruggen
 
 ### Description
-This is a NativeScript plugin that abstracts Apple HealthKit and Google Fit repositories to collect health data from user's smartphone. Unfortunately, I am a starter in NativeScript's plugins development so, because of that, not every data type is available right now.
-
-This work is based on [Cordova Health Plugin](https://github.com/dariosalvi78/cordova-plugin-health) (the propose, not the code). If you are experiencing some kind of issue, feel free to contact me or open a repository issue.   
+This is a NativeScript plugin that abstracts Apple HealthKit and Google Fit to read health data from the user's device.
 
 ## Prerequisites (Android)
 Google Fit API Key - Go to the [Google Developers Console](https://console.developers.google.com/), create a project, and enable the `Fitness API`.

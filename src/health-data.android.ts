@@ -34,6 +34,55 @@ export class HealthData extends Common {
     });
   }
 
+  isAuthorized(type: string | string[]): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+      const fitnessOptionsBuilder = FitnessOptions.builder();
+
+      if (typeof(type) === "string") {
+        fitnessOptionsBuilder.addDataType(this.getDataType(type), FitnessOptions.ACCESS_READ)
+      } else {
+        type.forEach(t => fitnessOptionsBuilder.addDataType(this.getDataType(t), FitnessOptions.ACCESS_READ));
+      }
+
+      resolve(GoogleSignIn.hasPermissions(
+          GoogleSignIn.getLastSignedInAccount(application.android.currentContext),
+          fitnessOptionsBuilder.build()));
+    });
+  }
+
+  // TODO, for writing: [{ name: string, readOnly: boolean }]
+  requestAuthorization(type: string | string[]): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+      const fitnessOptionsBuilder = FitnessOptions.builder();
+
+      if (typeof(type) === "string") {
+        fitnessOptionsBuilder.addDataType(this.getDataType(type), FitnessOptions.ACCESS_READ)
+      } else {
+        type.forEach(t => fitnessOptionsBuilder.addDataType(this.getDataType(t), FitnessOptions.ACCESS_READ));
+      }
+
+      const fitnessOptions = fitnessOptionsBuilder.build();
+
+      if (GoogleSignIn.hasPermissions(GoogleSignIn.getLastSignedInAccount(application.android.currentContext), fitnessOptions)) {
+        resolve(true);
+        return;
+      }
+
+      const activityResultHandler = (args: application.AndroidActivityResultEventData) => {
+        application.android.off(application.AndroidApplication.activityResultEvent, activityResultHandler);
+        resolve(args.requestCode === GOOGLE_FIT_PERMISSIONS_REQUEST_CODE && args.resultCode === android.app.Activity.RESULT_OK);
+      };
+      application.android.on(application.AndroidApplication.activityResultEvent, activityResultHandler);
+
+      GoogleSignIn.requestPermissions(
+          application.android.foregroundActivity,
+          GOOGLE_FIT_PERMISSIONS_REQUEST_CODE,
+          GoogleSignIn.getLastSignedInAccount(application.android.currentContext),
+          fitnessOptions);
+    });
+  }
+
+  // TODO how does Fit deal with unit conversion? mi <----> km, and such
   query(opts: QueryRequest): Promise<any> {
     return new Promise((resolve, reject) => {
       try {
@@ -125,48 +174,14 @@ export class HealthData extends Common {
     return this.aggregate(parsedData, aggregateBy);
   }
 
-  isAuthorized(constToRead: string) {
-  }
-
   private getDataType(pluginType: string): com.google.android.gms.fitness.data.DataType {
     // TODO check if the passed type is ok
     const typeOfData = acceptableDataTypesForCommonity[pluginType];
     return aggregatedDataTypes[typeOfData];
   }
-
-  requestAuthorization(type: string | string[]): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      const fitnessOptionsBuilder = FitnessOptions.builder();
-
-      if (typeof(type) === "string") {
-        fitnessOptionsBuilder.addDataType(this.getDataType(type), FitnessOptions.ACCESS_READ)
-      } else {
-        type.forEach(t => fitnessOptionsBuilder.addDataType(this.getDataType(t), FitnessOptions.ACCESS_READ));
-      }
-
-      const fitnessOptions = fitnessOptionsBuilder.build();
-
-      if (GoogleSignIn.hasPermissions(GoogleSignIn.getLastSignedInAccount(application.android.currentContext), fitnessOptions)) {
-        resolve(true);
-        return;
-      }
-
-      const activityResultHandler = (args: application.AndroidActivityResultEventData) => {
-        application.android.off(application.AndroidApplication.activityResultEvent, activityResultHandler);
-        resolve(args.requestCode === GOOGLE_FIT_PERMISSIONS_REQUEST_CODE && args.resultCode === android.app.Activity.RESULT_OK);
-      };
-      application.android.on(application.AndroidApplication.activityResultEvent, activityResultHandler);
-
-      GoogleSignIn.requestPermissions(
-          application.android.foregroundActivity,
-          GOOGLE_FIT_PERMISSIONS_REQUEST_CODE,
-          GoogleSignIn.getLastSignedInAccount(application.android.currentContext),
-          fitnessOptions);
-    });
-  }
 }
 
-export const aggregatedDataTypes = {
+const aggregatedDataTypes = {
   TYPE_STEP_COUNT_DELTA: DataType.AGGREGATE_STEP_COUNT_DELTA,
   TYPE_DISTANCE_DELTA: DataType.AGGREGATE_DISTANCE_DELTA,
   TYPE_CALORIES_EXPENDED: DataType.AGGREGATE_CALORIES_EXPENDED,
@@ -177,7 +192,7 @@ export const aggregatedDataTypes = {
   TYPE_NUTRITION: DataType.AGGREGATE_NUTRITION_SUMMARY
 };
 
-export const acceptableDataTypesForCommonity = {
+const acceptableDataTypesForCommonity = {
   steps: 'TYPE_STEP_COUNT_DELTA',
   distance: 'TYPE_DISTANCE_DELTA',
   calories: 'TYPE_CALORIES_EXPENDED',

@@ -8,6 +8,8 @@ import { alert } from "tns-core-modules/ui/dialogs";
 })
 
 export class AppComponent {
+  private static TYPES = ["height", "weight", "steps", "distance"];
+
   healthData: HealthData;
   resultToShow = "";
 
@@ -16,12 +18,16 @@ export class AppComponent {
   }
 
   isAvailable(): void {
-    console.log(">>>> is avail called");
     this.resultToShow = this.healthData.isAvailable() ? "Health Data available" : "Health Data not available :(";
   }
 
+  isAuthorized(): void {
+    this.healthData.isAuthorized("weight")
+        .then(authorized => this.resultToShow = (authorized ? "" : "Not ") + "authorized for " + AppComponent.TYPES);
+  }
+
   requestAuthForVariousTypes(): void {
-    this.healthData.requestAuthorization(["height", "weight", "steps", "distance"])
+    this.healthData.requestAuthorization(AppComponent.TYPES)
         .then(authenticated => setTimeout(() => alert({
           title: "Authentication result",
           message: "" + authenticated,

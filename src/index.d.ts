@@ -7,12 +7,13 @@ export declare const CategoryResultNeeded = "category_result_needed";
 export type AggregateBy = "hour" | "day" | "sourceAndDay";
 export declare class HealthData extends Common {
     isAvailable(): boolean;
+    isAuthorized(type: string | string[]): Promise<boolean>;
     requestAuthorization(type: string | string[]): Promise<boolean>;
-    isAuthorized(datatypes, onSuccess, onError);
     query(opts: QueryRequest): Promise<any>;
-    queryAggregated(opts, onSuccess, onError)
-    store(data, onSuccess, onError);
-    delete(data, onSuccess, onError);
+    // queryAggregated(opts, onSuccess, onError)
+    // store(data, onSuccess, onError);
+    // delete(data, onSuccess, onError);
+
     // getCommonData(config: ConfigurationData): Promise<ResultResponse>;
     // getUncommonData(config: ConfigurationData): Promise<ResultResponse>;
     // private getData(config, successCallback, failureCallback);

@@ -3,7 +3,8 @@
 <ScrollView>
     <StackLayout>
         <Button ios:text="Apple Health Data available?" android:text="Google Fit Data available?" (tap)="isAvailable()"></Button>
-        <Button text="Request Auth" (tap)="requestAuthForVariousTypes()"></Button>
+        <Button text="Is Authorized?" (tap)="isAuthorized()"></Button>
+        <Button text="Request Authorization" (tap)="requestAuthForVariousTypes()"></Button>
         <Button text="Get Daily Step data per source" (tap)="getData('steps', 'count', 'sourceAndDay')"></Button>
         <Button text="Get Hourly Distance data (km)" (tap)="getData('distance', 'km', 'hour')"></Button>
         <Button text="Get Hourly Distance data (mi)" (tap)="getData('distance', 'mi', 'hour')"></Button>

@@ -10,22 +10,31 @@ export class HealthData extends Common {
     }
   }
 
-  private resolveDataType(constToRead: string): HKObjectType {
-    if (quantityTypes[constToRead]) {
-      return HKObjectType.quantityTypeForIdentifier(quantityTypes[constToRead]);
-    } else if (characteristicTypes[constToRead]) {
-      return HKObjectType.characteristicTypeForIdentifier(characteristicTypes[constToRead]);
-    } else if (categoryTypes[constToRead]) {
-      return HKObjectType.categoryTypeForIdentifier(categoryTypes[constToRead]);
-    } else {
-      console.log("Constant not supported: " + constToRead);
-      return null;
-    }
-  }
-
   isAvailable(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       resolve(this.healthStore !== undefined);
+    });
+  }
+
+  isAuthorized(type: string | string[]): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+      if (this.healthStore === undefined) {
+        reject("Health not available");
+        return;
+      }
+
+      if (typeof(type) === "string") {
+        const authStatus = this.healthStore.authorizationStatusForType(this.resolveDataType(acceptableDataTypes[type]));
+        console.log(">>>> authStatus: " + authStatus);
+        resolve(authStatus === HKAuthorizationStatus.SharingAuthorized);
+      } else {
+        let authorized = true;
+        type.forEach(t => {
+          authorized = authorized &&
+              this.healthStore.authorizationStatusForType(this.resolveDataType(acceptableDataTypes[t])) === HKAuthorizationStatus.SharingAuthorized;
+        });
+        resolve(authorized);
+      }
     });
   }
 
@@ -39,8 +48,7 @@ export class HealthData extends Common {
       let dataToAccess;
       let readDataTypes;
       if (typeof constToRead === "string") {
-        let typeOfData = acceptableDataTypes[constToRead];
-        dataToAccess = this.resolveDataType(typeOfData);
+        dataToAccess = this.resolveDataType(acceptableDataTypes[constToRead]);
         readDataTypes = NSSet.setWithObject<HKObjectType>(dataToAccess);
       } else {
         readDataTypes = NSMutableSet.alloc<HKObjectType>().init();
@@ -82,26 +90,17 @@ export class HealthData extends Common {
     });
   }
 
-  isAuthorized(constToRead: string) {
-    return new Promise<boolean>((resolve, reject) => {
-      if (this.healthStore === undefined) {
-        reject("Health not available");
-        return;
-      }
-
-      let constToCheck = this.resolveDataType(constToRead);
-
-      const status: HKAuthorizationStatus = this.healthStore.authorizationStatusForType(constToCheck);
-      if (status === HKAuthorizationStatus.NotDetermined) {
-        reject('could ni determinate authorization status');
-      }
-      if (status === HKAuthorizationStatus.SharingAuthorized) {
-        resolve(true);
-      }
-      if (status === HKAuthorizationStatus.SharingDenied) {
-        reject('access is denied');
-      }
-    });
+  private resolveDataType(constToRead: string): HKObjectType {
+    if (quantityTypes[constToRead]) {
+      return HKObjectType.quantityTypeForIdentifier(quantityTypes[constToRead]);
+    } else if (characteristicTypes[constToRead]) {
+      return HKObjectType.characteristicTypeForIdentifier(characteristicTypes[constToRead]);
+    } else if (categoryTypes[constToRead]) {
+      return HKObjectType.categoryTypeForIdentifier(categoryTypes[constToRead]);
+    } else {
+      console.log("Constant not supported: " + constToRead);
+      return null;
+    }
   }
 
   private queryForQuantityOrCategoryData(dataType: string, start: Date, end: Date, aggregateBy: AggregateBy, unitString: string, callback: (data: Array<ResponseItem>, error: string) => void) {
@@ -189,7 +188,7 @@ export class HealthData extends Common {
   }
 }
 
-export const quantityTypes = {
+const quantityTypes = {
   activeEnergyBurned: HKQuantityTypeIdentifierActiveEnergyBurned,
   appleExerciseTime: HKQuantityTypeIdentifierAppleExerciseTime,
   basalBodyTemperature: HKQuantityTypeIdentifierBasalBodyTemperature,
@@ -265,7 +264,7 @@ export const quantityTypes = {
   uvExposure: HKQuantityTypeIdentifierUVExposure
 };
 
-export const characteristicTypes = {
+const characteristicTypes = {
   biologicalSex: HKCharacteristicTypeIdentifierBiologicalSex,
   bloodType: HKCharacteristicTypeIdentifierBloodType,
   dateOfBirthComponents: HKCharacteristicTypeIdentifierDateOfBirth,
@@ -273,7 +272,7 @@ export const characteristicTypes = {
   wheelchairUse: HKCharacteristicTypeIdentifierWheelchairUse
 };
 
-export const categoryTypes = {
+const categoryTypes = {
   appleStandHour: HKCategoryTypeIdentifierAppleStandHour,
   cervicalMucusQuality: HKCategoryTypeIdentifierCervicalMucusQuality,
   intermenstrualBleeding: HKCategoryTypeIdentifierIntermenstrualBleeding,
@@ -284,7 +283,7 @@ export const categoryTypes = {
   // "sleepAnalysis" : HKCategoryTypeIdentifierSleepAnalysis
 };
 
-export const acceptableDataTypes = {
+const acceptableDataTypes = {
   steps: 'stepCount',
   distance: /*"distanceCycling",*/ 'distanceWalkingRunning',
   calories: 'activeEnergyBurned' /*"basalEnergyBurned"*/,

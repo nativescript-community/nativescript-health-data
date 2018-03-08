@@ -22,7 +22,11 @@ export class AppComponent {
 
   requestAuthForVariousTypes(): void {
     this.healthData.requestAuthorization(["height", "weight", "steps", "distance"])
-        .then(authenticated => setTimeout(() => alert({ title: "Authentication result", message: "" + authenticated, okButtonText: "Ok!"}), 500))
+        .then(authenticated => setTimeout(() => alert({
+          title: "Authentication result",
+          message: "" + authenticated,
+          okButtonText: "Ok!"
+        }), 300))
         .catch(error => console.log("Request auth error: ", error));
   }
 
@@ -35,7 +39,10 @@ export class AppComponent {
           unit: unit,
           aggregateBy: aggregateBy
         })
-        .then(result => this.resultToShow = JSON.stringify(result))
+        .then(result => {
+          console.log(JSON.stringify(result));
+          this.resultToShow = JSON.stringify(result);
+        })
         .catch(error => this.resultToShow = error);
   }
 }

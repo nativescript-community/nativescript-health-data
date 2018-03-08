@@ -63,8 +63,43 @@ export class Common extends Observable {
     super();
   }
 
+  protected aggregate(parsedData: Array<ResponseItem>, aggregateBy?: AggregateBy): Array<ResponseItem> {
+    if (aggregateBy) {
+      let result: Array<ResponseItem> = [];
+      if (aggregateBy === "sourceAndDay") {
+        // extract the unique sources
+        const distinctSources: Set<string> = new Set();
+        parsedData.forEach(item => distinctSources.add(item.source));
+        // for each source, filter and aggregate the data
+        distinctSources.forEach(source => this.aggregateData(parsedData.filter(item => item.source === source), aggregateBy, result));
+      } else {
+        this.aggregateData(parsedData, aggregateBy, result);
+      }
+      return result;
+    } else {
+      return parsedData;
+    }
+  }
+
+  private aggregateData(parsedData: Array<ResponseItem>, aggregateBy: AggregateBy, result: Array<ResponseItem>): void {
+    parsedData.forEach((item, i) => {
+      const previousItem = i === 0 ? null : parsedData[i - 1];
+      if (previousItem === null || !this.isSameAggregationInterval(item, previousItem, aggregateBy)) {
+        result.push(<ResponseItem>{
+          source: item.source,
+          start: item.start,
+          end: item.end,
+          value: item.value
+        })
+      } else {
+        result[result.length - 1].value += item.value;
+        result[result.length - 1].end = item.end;
+      }
+    });
+  }
+
   // note that the startdate determines the interval
-  protected isSameAggregationInterval(item: ResponseItem, previousItem: ResponseItem, aggregateBy: AggregateBy) {
+  private isSameAggregationInterval(item: ResponseItem, previousItem: ResponseItem, aggregateBy: AggregateBy) {
     const isSameDay = item.start.toDateString() === previousItem.start.toDateString();
     if (aggregateBy === "hour") {
       return isSameDay && item.start.getHours() === previousItem.start.getHours();

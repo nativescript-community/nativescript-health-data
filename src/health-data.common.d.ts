@@ -40,5 +40,7 @@ export declare class Common extends Observable {
     hasPermissions: boolean;
     result: string;
     constructor();
-    protected isSameAggregationInterval(item: ResponseItem, previousItem: ResponseItem, aggregateBy: AggregateBy): boolean;
+    protected aggregate(parsedData: Array<ResponseItem>, aggregateBy?: AggregateBy): Array<ResponseItem>;
+    private aggregateData(parsedData, aggregateBy, result);
+    private isSameAggregationInterval(item, previousItem, aggregateBy);
 }

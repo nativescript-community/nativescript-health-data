@@ -104,10 +104,6 @@ export class HealthData extends Common {
     });
   }
 
-  private convertDatetoNSDate(date: Date): NSDate {
-    return NSDate.alloc().initWithTimeIntervalSince1970(date.getTime());
-  }
-
   private queryForQuantityOrCategoryData(dataType: string, start: Date, end: Date, aggregateBy: AggregateBy, unitString: string, callback: (data: Array<ResponseItem>, error: string) => void) {
     let objectType = this.resolveDataType(dataType);
 
@@ -123,7 +119,6 @@ export class HealthData extends Common {
         objectType, predicate, null, sortBy, (query: HKSampleQuery, listResults: NSArray<HKSample>, error: NSError) => {
           if (listResults) {
             const parsedData: Array<ResponseItem> = [];
-            let result: Array<ResponseItem> = [];
 
             for (let index = 0; index < listResults.count; index++) {
               const sample: HKSample = listResults.objectAtIndex(index);
@@ -147,21 +142,7 @@ export class HealthData extends Common {
               parsedData.push(resultItem);
             }
 
-            if (aggregateBy) {
-              if (aggregateBy === "sourceAndDay") {
-                // extract the unique sources
-                const distinctSources: Set<string> = new Set();
-                parsedData.forEach(item => distinctSources.add(item.source));
-                // for each source, filter and aggregate the data
-                distinctSources.forEach(source => this.aggregateData(parsedData.filter(item => item.source === source), aggregateBy, result));
-              } else {
-                this.aggregateData(parsedData, aggregateBy, result);
-              }
-            } else {
-              result = parsedData;
-            }
-
-            callback(result, null);
+            callback(this.aggregate(parsedData, aggregateBy), null);
           } else {
             console.dir(error);
             callback(null, error.localizedDescription);
@@ -169,23 +150,6 @@ export class HealthData extends Common {
         }
     );
     this.healthStore.executeQuery(query);
-  }
-
-  private aggregateData(parsedData: Array<ResponseItem>, aggregateBy: AggregateBy, result: Array<ResponseItem>): void {
-    parsedData.forEach((item, i) => {
-      const previousItem = i === 0 ? null : parsedData[i - 1];
-      if (previousItem === null || !this.isSameAggregationInterval(item, previousItem, aggregateBy)) {
-        result.push(<ResponseItem>{
-          source: item.source,
-          start: item.start,
-          end: item.end,
-          value: item.value
-        })
-      } else {
-        result[result.length - 1].value += item.value;
-        result[result.length - 1].end = item.end;
-      }
-    });
   }
 
   private queryForCharacteristicData(dataType: string) {

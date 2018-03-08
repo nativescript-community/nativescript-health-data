@@ -1,7 +1,9 @@
 /// <reference path="./android.def.d.ts" />
-import { Common, QueryRequest, ResponseItem } from './health-data.common';
+import { AggregateBy, Common, QueryRequest, ResponseItem } from './health-data.common';
 import * as utils from 'tns-core-modules/utils/utils';
 import * as application from 'tns-core-modules/application';
+import { ad } from "tns-core-modules/utils/utils";
+import getApplicationContext = ad.getApplicationContext;
 
 const GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 2;
 
@@ -35,26 +37,23 @@ export class HealthData extends Common {
   query(opts: QueryRequest): Promise<any> {
     return new Promise((resolve, reject) => {
       try {
-        let readRequest = new DataReadRequest.Builder()
+        const readRequest = new DataReadRequest.Builder()
         // using 'read' instead of 'aggregate' for now, for more finegrain control
         //     .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
+        //     .bucketByTime(1, TimeUnit.HOURS)
             .read(this.getDataType(opts.dataType))
             .setTimeRange(opts.startDate.getTime(), opts.endDate.getTime(), TimeUnit.MILLISECONDS)
-            // if we don't get distinct sources here, then do bucketBySession and calculate it ourselves (like on iOS)
-            // .bucketByTime(1, TimeUnit.DAYS)
             .build();
 
         Fitness.getHistoryClient(application.android.currentContext, GoogleSignIn.getLastSignedInAccount(application.android.currentContext))
             .readData(readRequest)
             .addOnSuccessListener(new com.google.android.gms.tasks.OnSuccessListener({
               onSuccess: (dataReadResponse: any /* com.google.android.gms.fitness.result.DataReadResponse */) => {
-                console.log(">>>>> read success: " + dataReadResponse);
-                resolve(this.parseData(dataReadResponse.getResult()));
+                resolve(this.parseData(dataReadResponse.getResult(), opts.aggregateBy));
               }
             }))
             .addOnFailureListener(new com.google.android.gms.tasks.OnFailureListener({
               onFailure: (exception: any) => {
-                console.log(">>>>> read exception: " + exception);
                 reject(exception.getMessage());
               }
             }))
@@ -69,35 +68,51 @@ export class HealthData extends Common {
     });
   }
 
-  private parseData(readResult: com.google.android.gms.fitness.result.DataReadResult) {
+  private parseData(readResult: com.google.android.gms.fitness.result.DataReadResult, aggregateBy?: AggregateBy) {
     let result = [];
     if (readResult.getBuckets().size() > 0) {
       for (let indexBucket = 0; indexBucket < readResult.getBuckets().size(); indexBucket++) {
-        console.log(readResult.getBuckets().get(indexBucket));
         let dataSets = readResult.getBuckets().get(indexBucket).getDataSets();
         for (let indexDataSet = 0; indexDataSet < dataSets.size(); indexDataSet++) {
-          result = result.concat(this.dumpDataSet(dataSets.get(indexDataSet)));
+          result = result.concat(this.dumpDataSet(dataSets.get(indexDataSet), aggregateBy));
         }
       }
     } else if (readResult.getDataSets().size() > 0) {
       for (let index = 0; index < readResult.getDataSets().size(); index++) {
-        result = result.concat(this.dumpDataSet(readResult.getDataSets().get(index)));
+        result = result.concat(this.dumpDataSet(readResult.getDataSets().get(index), aggregateBy));
       }
     }
     return result;
   }
 
-  private dumpDataSet(dataSet: com.google.android.gms.fitness.data.DataSet) {
-    let result = [];
-    let dateFormat = java.text.DateFormat.getTimeInstance();
-    const source = dataSet.getDataSource().getName();
+  private dumpDataSet(dataSet: com.google.android.gms.fitness.data.DataSet, aggregateBy?: AggregateBy) {
+    const parsedData: Array<ResponseItem> = [];
+    const packageManager = getApplicationContext().getPackageManager();
+    const packageToAppNameCache = new Map<string, string>();
+
     for (let index = 0; index < dataSet.getDataPoints().size(); index++) {
-      let pos = dataSet.getDataPoints().get(index);
+      const pos = dataSet.getDataPoints().get(index);
 
       for (let indexField = 0; indexField < pos.getDataType().getFields().size(); indexField++) {
         let field = pos.getDataType().getFields().get(indexField);
         const value = pos.getValue(field);
-        result.push(<ResponseItem>{
+
+        const packageName = pos.getOriginalDataSource().getAppPackageName();
+        let source = packageName ? packageName : pos.getOriginalDataSource().getStreamName();
+        if (packageName) {
+          if (!packageToAppNameCache.has(packageName)) {
+            try {
+              const appName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageName, android.content.pm.PackageManager.GET_META_DATA));
+              packageToAppNameCache.set(packageName, appName);
+            } catch (ignore) {
+              // the app has probably been unsintalled, so use the package name
+              packageToAppNameCache.set(packageName, packageName);
+            }
+          }
+          source = packageToAppNameCache.get(packageName);
+        }
+
+        parsedData.push(<ResponseItem>{
           start: new Date(pos.getStartTime(TimeUnit.MILLISECONDS)),
           end: new Date(pos.getEndTime(TimeUnit.MILLISECONDS)),
           // https://developers.google.com/android/reference/com/google/android/gms/fitness/data/Value
@@ -106,7 +121,8 @@ export class HealthData extends Common {
         });
       }
     }
-    return result;
+
+    return this.aggregate(parsedData, aggregateBy);
   }
 
   isAuthorized(constToRead: string) {
@@ -115,9 +131,7 @@ export class HealthData extends Common {
   private getDataType(pluginType: string): com.google.android.gms.fitness.data.DataType {
     // TODO check if the passed type is ok
     const typeOfData = acceptableDataTypesForCommonity[pluginType];
-    const dataType = aggregatedDataTypes[typeOfData];
-    console.log(">>>> resolved dataType: " + dataType);
-    return dataType;
+    return aggregatedDataTypes[typeOfData];
   }
 
   requestAuthorization(type: string | string[]): Promise<boolean> {
@@ -158,7 +172,7 @@ export const aggregatedDataTypes = {
   TYPE_CALORIES_EXPENDED: DataType.AGGREGATE_CALORIES_EXPENDED,
   TYPE_HEIGHT: DataType.TYPE_HEIGHT, // TODO or AGGREGATE_HEIGHT_SUMMARY
   TYPE_WEIGHT: DataType.AGGREGATE_WEIGHT_SUMMARY,
-  "TYPE_HEART_RATE_BPM": DataType.AGGREGATE_HEART_RATE_SUMMARY,
+  TYPE_HEART_RATE_BPM: DataType.AGGREGATE_HEART_RATE_SUMMARY,
   TYPE_BODY_FAT_PERCENTAGE: DataType.AGGREGATE_BODY_FAT_PERCENTAGE_SUMMARY,
   TYPE_NUTRITION: DataType.AGGREGATE_NUTRITION_SUMMARY
 };

@@ -7,9 +7,7 @@ export declare class HealthData extends Common {
     requestAuthorization(constToRead: string | string[]): Promise<boolean>;
     query(opts: QueryRequest): Promise<any>;
     isAuthorized(constToRead: string): Promise<boolean>;
-    private convertDatetoNSDate(date);
     private queryForQuantityOrCategoryData(dataType, start, end, aggregateBy, unitString, callback);
-    private aggregateData(parsedData, aggregateBy, result);
     private queryForCharacteristicData(dataType);
 }
 export declare const quantityTypes: {

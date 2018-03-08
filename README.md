@@ -8,10 +8,15 @@ This work is based on [Cordova Health Plugin](https://github.com/dariosalvi78/co
 
 ## Prerequisites
 
-Google Fit API Key - Go to the [Google Developers Console](https://console.developers.google.com/), create a project, and enable the ```Google Fitness API```. Then under credentials, create an OAuth for an Android App. If you are using Linux/OSX, generate your SHA1-key with the code below. Then, make sure you download the result OAuth client key, rename it to ```client_id.json``` and place it in project root directory.
+Google Fit API Key - Go to the [Google Developers Console](https://console.developers.google.com/), create a project, and enable the `Fitness API`.
+Then under `Credentials`, create a `Fitness API` OAuth2 client ID for an Android App (select `User data` and press the `What credentials do I need?` button).
+If you are using Linux/maxOS, generate your SHA1-key with the code below.
 
-```keytool -exportcert -keystore ~/.android/<debug or production>.keystore -list -v```
+```shell
+keytool -exportcert -keystore ~/.android/<debug or production>.keystore -list -v
+```
 
+> Note that the default (debug) keystore password is empty.
 
 ## Installation
 
@@ -32,6 +37,7 @@ import { HealthData } from "nativescript-health-data";
 Before you can grab any kind of user info, you must initialize a client object. Otherwise, you will always get an error response.
 
 ```typescript
+import { HealthData } from "nativescript-health-data";
 let healthData = new HealthData();
 healthData.createClient()
 	.then((fulfilled) => {

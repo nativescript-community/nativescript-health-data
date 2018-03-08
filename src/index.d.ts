@@ -1,21 +1,20 @@
-import { Common, ConfigurationData, ResultResponse } from './health-data.common';
-export declare var HKHealthStore: any;
+import { Common, QueryRequest } from './health-data.common';
 export declare const QuantityTypeNeeded = "quantity_type_needed";
 export declare const CharacteristicTypeNeeded = "characteristic_type_needed";
 export declare const CategoryTypeNeeded = "category_type_needed";
 export declare const QuantityResultNeeded = "quantity_result_needed";
 export declare const CategoryResultNeeded = "category_result_needed";
+export type AggregateBy = "hour" | "day" | "sourceAndDay";
 export declare class HealthData extends Common {
     isAvailable(): boolean;
-    requestAuthorization(datatypes, onSuccess, onError);
+    requestAuthorization(type: string | string[]): Promise<boolean>;
     isAuthorized(datatypes, onSuccess, onError);
-    query(opts, onSuccess, onError);
+    query(opts: QueryRequest): Promise<any>;
     queryAggregated(opts, onSuccess, onError)
     store(data, onSuccess, onError);
     delete(data, onSuccess, onError);
     // getCommonData(config: ConfigurationData): Promise<ResultResponse>;
     // getUncommonData(config: ConfigurationData): Promise<ResultResponse>;
-    // createClient(): Promise<{}>;
     // private getData(config, successCallback, failureCallback);
     // private queryFitnessData(config: ConfigurationData, fn): void;
     // private getPermissions(fn);
@@ -27,7 +26,6 @@ export declare class HealthData extends Common {
     // private convertToQuantityIdentifier(data);
     // private convertToCharacteristicIdentifier(data);
     // private convertToCategoryIdentifier(data);
-    constructor();
 }
 
 export declare const quantityTypes: {
@@ -104,6 +102,7 @@ export declare const quantityTypes: {
     "swimmingStrokeCount": string;
     "uvExposure": string;
 };
+
 export declare const characteristicTypes: {
     "biologicalSex": string;
     "bloodType": string;
@@ -111,6 +110,7 @@ export declare const characteristicTypes: {
     "fitzpatrickSkinType": string;
     "wheelchairUse": string;
 };
+
 export declare const categoryTypes: {
     "appleStandHour": string;
     "cervicalMucusQuality": string;
@@ -121,29 +121,3 @@ export declare const categoryTypes: {
     "sexualActivity": string;
     "sleepAnalysis": string;
 };
-
-// android
-
-/*
-isAvailable(onSuccess, onError);
-requestAuthorization(datatypes, onSuccess, onError);
-isAuthorized(datatypes, onSuccess, onError);
-query(opts, onSuccess, onError);
-queryAggregated(opts, onSuccess, onError)
-store(data, onSuccess, onError);
-delete(data, onSuccess, onError);
-*/
-
-
-// ios
-
-/*
-isAvailable(success, error);
-requestAuthorization(dts, onSuccess, onError);
-isAuthorized(dts, onSuccess, onError);
-query(opts, onSuccess, onError);
-queryAggregated(opts, onSuccess, onError);
-store(data, onSuccess, onError);
-delete(data, onSuccess, onError);
-
-*/ 

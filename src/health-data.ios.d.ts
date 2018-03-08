@@ -1,22 +1,16 @@
-import { Common, ConfigurationData, ResultResponse } from "./health-data.common";
-export declare const QuantityTypeNeeded = "quantity_type_needed";
-export declare const CharacteristicTypeNeeded = "characteristic_type_needed";
-export declare const CategoryTypeNeeded = "category_type_needed";
-export declare const QuantityResultNeeded = "quantity_result_needed";
-export declare const CategoryResultNeeded = "category_result_needed";
+import { Common, QueryRequest } from './health-data.common';
 export declare class HealthData extends Common {
     healthStore: HKHealthStore;
     constructor();
-    getCommonData(config: ConfigurationData): Promise<ResultResponse>;
-    getUncommonData(config: ConfigurationData): Promise<ResultResponse>;
-    private getData(config, successCallback, failureCallback);
-    private requestPermissionForData(constToRead, type, successCallback, failureCallback);
-    private askForQuantityOrCategoryData(constToRead, type, successCallback, failureCallback);
-    private askForCharacteristicData(data, successCallback, failureCallback);
-    private convertToQuantityIdentifier(data);
-    private convertToCharacteristicIdentifier(data);
-    private convertToCategoryIdentifier(data);
-    createClient(): Promise<{}>;
+    private resolveDataType(constToRead);
+    isAvailable(): Promise<boolean>;
+    requestAuthorization(constToRead: string | string[]): Promise<boolean>;
+    query(opts: QueryRequest): Promise<any>;
+    isAuthorized(constToRead: string): Promise<boolean>;
+    private convertDatetoNSDate(date);
+    private queryForQuantityOrCategoryData(dataType, start, end, aggregateBy, unitString, callback);
+    private aggregateData(parsedData, aggregateBy, result);
+    private queryForCharacteristicData(dataType);
 }
 export declare const quantityTypes: {
     activeEnergyBurned: string;

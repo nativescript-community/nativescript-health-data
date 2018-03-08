@@ -1,15 +1,11 @@
 {
-  "description": "NativeScript Application",
-  "license": "SEE LICENSE IN <your-license-filename>",
-  "readme": "NativeScript Application",
-  "repository": "<fill-your-repository-here>",
   "nativescript": {
-    "id": "org.nativescript.demong",
+    "id": "org.nativescript.plugindemo.healthdata",
     "tns-ios": {
-      "version": "3.3.0"
+      "version": "3.4.1"
     },
     "tns-android": {
-      "version": "3.3.1"
+      "version": "3.4.1"
     }
   },
   "dependencies": {
@@ -34,7 +30,7 @@
     "babel-types": "6.25.0",
     "babylon": "6.17.4",
     "lazy": "1.0.11",
-    "nativescript-dev-typescript": "~0.5.1",
-    "typescript": "~2.5.3"
+    "nativescript-dev-typescript": "~0.6.0",
+    "typescript": "~2.6.0"
   }
 }

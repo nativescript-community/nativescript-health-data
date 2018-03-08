@@ -4,6 +4,7 @@
 *.js
 *.js.map
 *.log
+*.log.*
 !src/scripts/*.js
 !seed-tests/*.js
 seed-tests/seed-copy/**/*.*

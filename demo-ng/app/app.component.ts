@@ -1,77 +1,41 @@
-import { Component, NgZone } from "@angular/core";
-import { HealthData } from "nativescript-health-data";
-import { Subscription } from 'rxjs/Subscription';
+import { Component } from "@angular/core";
+import { AggregateBy, HealthData } from "nativescript-health-data";
+import { alert } from "tns-core-modules/ui/dialogs";
 
 @Component({
-    selector: "ns-app",
-    templateUrl: "app.component.html"
+  selector: "ns-app",
+  templateUrl: "app.component.html"
 })
 
 export class AppComponent {
-    healthData: HealthData;
-    resultToShow = '';
+  healthData: HealthData;
+  resultToShow = "";
 
-    constructor(private ngZone: NgZone) {
-        this.healthData = new HealthData();
-    }
+  constructor() {
+    this.healthData = new HealthData();
+  }
 
-    getData(data: string) {
-        let context = this;
+  isAvailable(): void {
+    console.log(">>>> is avail called");
+    this.resultToShow = this.healthData.isAvailable() ? "Health Data available" : "Health Data not available :(";
+  }
 
-        // const configData = {
-        //     gfStartTimeInMillis: new Date(2017, 7, 1).valueOf(),
-        //     gfEndTimeInMillis: new Date().valueOf(),
-        //     gfBucketUnit: "days",
-        //     gfBucketSize: 1,
-        //     typeOfData: "bodyMassIndex"
-        // };
+  requestAuthForVariousTypes(): void {
+    this.healthData.requestAuthorization(["height", "weight", "steps", "distance"])
+        .then(authenticated => setTimeout(() => alert({ title: "Authentication result", message: "" + authenticated, okButtonText: "Ok!"}), 500))
+        .catch(error => console.log("Request auth error: ", error));
+  }
 
-        // this.healthData.getUncommonData(configData)
-        //     .then((fulfilled) => {
-        //         this.ngZone.run(() => context.resultToShow = fulfilled);
-        //     })
-        //     .catch((error) => {
-        //         this.ngZone.run(() => context.resultToShow = error);
-        //     });
-
-        const configData = {
-            gfStartTimeInMillis: new Date(2017, 7, 1).valueOf(),
-            gfEndTimeInMillis: new Date().valueOf(),
-            gfBucketUnit: 'days',
-            gfBucketSize: 1,
-            typeOfData: 'distance'
-        };
-        Promise.all([
-            this.healthData.getCommonData(this.changeType(configData, "distance")),
-            this.healthData.getCommonData(this.changeType(configData, "steps")),
-            this.healthData.getCommonData(this.changeType(configData, "calories")),
-            this.healthData.getCommonData(this.changeType(configData, "height")),
-            this.healthData.getCommonData(this.changeType(configData, "weight")),
-            this.healthData.getCommonData(this.changeType(configData, "heartRate"))
-        ])
-            .then(arrayofData => {
-                this.ngZone.run(() => (context.resultToShow += JSON.stringify(arrayofData)));
-                console.log(JSON.stringify(arrayofData));
-            })
-            .catch(error => {
-                console.log(error);
-            });
-    }
-
-    changeType(config, type) {
-        return  Object.assign({}, config, {
-            typeOfData: type
-        });
-    }
-
-    createClient() {
-        let context = this;
-        this.healthData.createClient()
-            .then((fulfilled) => {
-                this.ngZone.run(() => context.resultToShow += JSON.stringify(fulfilled));
-            })
-            .catch((error) => {
-                this.ngZone.run(() => context.resultToShow = error);
-            });
-    }
+  getData(dataType: string, unit: string, aggregateBy?: AggregateBy): void {
+    this.healthData.query(
+        {
+          startDate: new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+          endDate: new Date(), // now
+          dataType: dataType,
+          unit: unit,
+          aggregateBy: aggregateBy
+        })
+        .then(result => this.resultToShow = JSON.stringify(result))
+        .catch(error => this.resultToShow = error);
+  }
 }

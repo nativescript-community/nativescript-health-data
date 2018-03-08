@@ -1,25 +1,24 @@
 /// <reference path="android.def.d.ts" />
-import { Common, ConfigurationData, ResultResponse } from "./health-data.common";
+import { Common, QueryRequest } from './health-data.common';
 export declare class HealthData extends Common {
-    private mClient;
-    getCommonData(config: ConfigurationData): Promise<ResultResponse>;
-    getUncommonData(config: ConfigurationData): Promise<ResultResponse>;
-    private getData(config, successCallback, failureCallback);
-    private queryFitnessData(config, fn);
+    isAvailable(): Promise<boolean>;
+    query(opts: QueryRequest): Promise<any>;
     private parseData(readResult);
     private dumpDataSet(dataSet);
-    private getPermissions(accesses, fn);
-    createClient(): Promise<{}>;
-    private validateConfiguration(config);
-    constructor();
+    isAuthorized(constToRead: string): void;
+    private getDataType(pluginType);
+    requestAuthorization(type: string | string[]): Promise<boolean>;
+    requestAuthorizationOrig(accesses: string[]): Promise<boolean>;
 }
 export declare const aggregatedDataTypes: {
-    TYPE_STEP_COUNT_DELTA: com.google.android.gms.fitness.data.DataType;
-    TYPE_DISTANCE_DELTA: com.google.android.gms.fitness.data.DataType;
-    TYPE_CALORIES_EXPENDED: com.google.android.gms.fitness.data.DataType;
-    TYPE_WEIGHT: com.google.android.gms.fitness.data.DataType;
-    TYPE_BODY_FAT_PERCENTAGE: com.google.android.gms.fitness.data.DataType;
-    TYPE_NUTRITION: com.google.android.gms.fitness.data.DataType;
+    TYPE_STEP_COUNT_DELTA: any;
+    TYPE_DISTANCE_DELTA: any;
+    TYPE_CALORIES_EXPENDED: any;
+    TYPE_HEIGHT: any;
+    TYPE_WEIGHT: any;
+    "TYPE_HEART_RATE_BPM": any;
+    TYPE_BODY_FAT_PERCENTAGE: any;
+    TYPE_NUTRITION: any;
 };
 export declare const acceptableDataTypesForCommonity: {
     steps: string;

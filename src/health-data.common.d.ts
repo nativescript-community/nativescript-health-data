@@ -1,15 +1,24 @@
 import { Observable } from "tns-core-modules/data/observable";
 export interface ConfigurationData {
-    gfStartTimeInMillis: number;
-    gfEndTimeInMillis: number;
+    startDate: Date;
+    endDate: Date;
     gfBucketUnit: string;
     gfBucketSize: number;
     typeOfData: string;
 }
+export declare type AggregateBy = "hour" | "day" | "sourceAndDay";
+export interface QueryRequest {
+    startDate: Date;
+    endDate: Date;
+    dataType: string;
+    aggregateBy?: AggregateBy;
+    unit: string;
+}
 export interface ResponseItem {
     start: Date;
     end: Date;
-    value: string;
+    value: number;
+    source?: string;
 }
 export interface ResultResponse {
     status: {
@@ -31,4 +40,5 @@ export declare class Common extends Observable {
     hasPermissions: boolean;
     result: string;
     constructor();
+    protected isSameAggregationInterval(item: ResponseItem, previousItem: ResponseItem, aggregateBy: AggregateBy): boolean;
 }

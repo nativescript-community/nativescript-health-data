@@ -6,8 +6,7 @@ This is a NativeScript plugin that abstracts Apple HealthKit and Google Fit repo
 
 This work is based on [Cordova Health Plugin](https://github.com/dariosalvi78/cordova-plugin-health) (the propose, not the code). If you are experiencing some kind of issue, feel free to contact me or open a repository issue.   
 
-## Prerequisites
-
+## Prerequisites (Android)
 Google Fit API Key - Go to the [Google Developers Console](https://console.developers.google.com/), create a project, and enable the `Fitness API`.
 Then under `Credentials`, create a `Fitness API` OAuth2 client ID for an Android App (select `User data` and press the `What credentials do I need?` button).
 If you are using Linux/maxOS, generate your SHA1-key with the code below.
@@ -41,7 +40,6 @@ export class MyHealthyClass {
     this.healthData = new HealthData();
   }
 }
-
 ```
 
 ### `isAvailable`
@@ -54,7 +52,7 @@ const isAvailable = this.healthData.isAvailable();
 ### `isAuthorized`
 This function (and the next one) takes an `Array` of `HealthDataType`'s. Each of those has a `name` and an `accessType`.
 
-- The `name` can be one of `steps`, .. TODO
+- The `name` can be one of the ['Available Data Types'](#available-data-types).
 - The accessType can be one of `read`, `write`, or `readAndWrite`.
 
 ```typescript
@@ -79,7 +77,12 @@ this.healthData.requestAuthorization(types)
 ```
 
 ### `query`
-dsdasd
+Mandatory properties are `startData`, `endDate`, and `dataType`.
+The `dataType` must be one of the ['Available Data Types'](#available-data-types).
+
+By default data is not aggregated, so all individual datapoints are returned.
+This plugin however offers a way to aggregate the data by either `hour`, `day`, or `sourceAndDay`,
+the latter will enable you to read daily data per source (Fitbit, Nike Run Club, manual entry, etc).
 
 ```typescript
 this.healthData.query(
@@ -94,11 +97,8 @@ this.healthData.query(
     .catch(error => this.resultToShow = error);
 ```
 
-
-TODO below
-
 ## Available Data Types
-Unfortunatelly, this plugin is in the beginning. So, the capabilities are the possibles, for now.
+With version 1.0.0 these are the supported types of data you can read:
 
 | TypeOfData | GoogleFit Data Type | Apple HealthKit Data Type |
 | --- | --- | --- |
@@ -109,24 +109,6 @@ Unfortunatelly, this plugin is in the beginning. So, the capabilities are the po
 | weight | TYPE_WEIGHT | HKQuantityTypeIdentifierBodyMass |
 | heartRate | TYPE_HEART_RATE_BPM | HKQuantityTypeIdentifierHeartRate |
 | fatPercentage | TYPE_BODY_FAT_PERCENTAGE | HKQuantityTypeIdentifierBodyFatPercentage |
-
-I hope I can develop continuously to provide new common data types soon.
-However, if you really need other data types besides these ones, you can ask for them but not commonly. For example, if you need data about Systolic Blood Pressure, you can use this snippet, but you will only get success response message if you are using **iOS**.
-
-```typescript
-const configData = {
-    typeOfData: "bloodPressureSystolic"
-};
-
-this.healthData.getUncommonData(configData)
-	.then((fulfilled) => {
-    	console.log(fulfilled));
-	}).catch((error) => {
-		console.log(error);
-	});
-    
-```
-You can check available uncommon data in [iOS Plugin File](https://github.com/filipemendes1994/nativescript-health-data/blob/master/src/health-data.ios.ts)
 
 ## Credits
 * [Filipe Mendes](https://github.com/filipemendes1994/) for a superb first version of this repo, while working for SPMS, Shared Services for Ministry of Health (of Portugal). He kindly transferred this repo to me when he no longer had time to maintain it.

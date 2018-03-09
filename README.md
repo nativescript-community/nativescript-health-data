@@ -1,132 +1,128 @@
-# Health Data for NativeScript
-## A cross platform (iOS & Android) plugin 
+# Health Data plugin for NativeScript
+
+[![Build Status][build-status]][build-url]
+[![NPM version][npm-image]][npm-url]
+[![Downloads][downloads-image]][npm-url]
+[![Twitter Follow][twitter-image]][twitter-url]
+
+[build-status]:https://travis-ci.org/EddyVerbruggen/nativescript-health-data.svg?branch=master
+[build-url]:https://travis-ci.org/EddyVerbruggen/nativescript-health-data
+[npm-image]:http://img.shields.io/npm/v/nativescript-health-data.svg
+[npm-url]:https://npmjs.org/package/nativescript-health-data
+[downloads-image]:http://img.shields.io/npm/dm/nativescript-health-data.svg
+[twitter-image]:https://img.shields.io/twitter/follow/eddyverbruggen.svg?style=social&label=Follow%20me
+[twitter-url]:https://twitter.com/eddyverbruggen
 
 ### Description
-This is a NativeScript plugin that abstracts Apple HealthKit and Google Fit repositories to collect health data from user's smartphone. Unfortunately, I am a starter in NativeScript's plugins development so, because of that, not every data type is available right now.
+This is a NativeScript plugin that abstracts Apple HealthKit and Google Fit to read health data from the user's device.
 
-This work is based on [Cordova Health Plugin](https://github.com/dariosalvi78/cordova-plugin-health) (the propose, not the code). If you are experiencing some kind of issue, feel free to contact me or open a repository issue.   
+## Prerequisites (Android)
+Google Fit API Key - Go to the [Google Developers Console](https://console.developers.google.com/), create a project, and enable the `Fitness API`.
+Then under `Credentials`, create a `Fitness API` OAuth2 client ID for an Android App (select `User data` and press the `What credentials do I need?` button).
+If you are using Linux/maxOS, generate your SHA1-key with the code below.
 
-## Prerequisites
+```shell
+keytool -exportcert -keystore ~/.android/<debug or production>.keystore -list -v
+```
 
-Google Fit API Key - Go to the [Google Developers Console](https://console.developers.google.com/), create a project, and enable the ```Google Fitness API```. Then under credentials, create an OAuth for an Android App. If you are using Linux/OSX, generate your SHA1-key with the code below. Then, make sure you download the result OAuth client key, rename it to ```client_id.json``` and place it in project root directory.
-
-```keytool -exportcert -keystore ~/.android/<debug or production>.keystore -list -v```
-
+> Note that the default (debug) keystore password is empty.
 
 ## Installation
 
-Install the plugin using the NativeScript CLI tooling
+Install the plugin using the NativeScript CLI
 
 ```
 tns plugin add nativescript-health-data
 ```
 
-## Usage 
-The examples below are presented in Typescript, such that this [demo](https://github.com/filipemendes1994/nativescript-health-data/tree/master/demo-ng) was developed in Nativescript w/ Angular sample project. So, start for import what matters to you.
+## API 
+The examples below are all in TypeScript, and the [demo](https://github.com/EddyVerbruggen/nativescript-health-data/tree/master/demo-ng) was developed in Nativescript w/ Angular.
 
-```
-import { HealthData } from "nativescript-health-data";
-``` 
-
-### Create HealthData Client
-Before you can grab any kind of user info, you must initialize a client object. Otherwise, you will always get an error response.
+This is how you can import and instantiate the plugin, all examples expect this setup:
 
 ```typescript
-let healthData = new HealthData();
-healthData.createClient()
-	.then((fulfilled) => {
-    	console.log(fulfilled);
-    }).catch((error) => {
-    	console.log(error);
-    });
-```
+import { AggregateBy, HealthData, HealthDataType } from "nativescript-health-data";
 
-### Get Data
-To collect the user data, simply apply this little snippet.
+export class MyHealthyClass {
+  private healthData: HealthData;
 
-```typescript
-healthData.getCommonData(configData)
-	.then((fulfilled) => {
-    	console.log(fulfilled);
-    }).catch((error) => {
-        console.log(error);
-    });
-```
-
-### Configuration Object
-Like you can see, the ```getCommonData(configObj)``` method receives a configuration object, something like this one above.
-
-```typescript
-interface ConfigurationData {
-  gfStartTimeInMillis: number,
-  gfEndTimeInMillis: number,
-  gfBucketUnit: string, 
-  gfBucketSize: number,
-  typeOfData: string
+  constructor() {
+    this.healthData = new HealthData();
+  }
 }
 ```
-*Note*: The *gf* prefix attributes are exclusive configurations to Google Fit.
 
-### Success and Error Response Messages
-From any API endpoint, you will receive one of these 2 objects. In success case, you will receive this:
+### `isAvailable`
+This function does not return a Promise; it resolves immediately, and tells you whether or not the device supports Health Data. On iOS this is probably always `true`. On Android the user will be prompted to (automatically) update their Play Services version in case it's not sufficiently up to date.
 
-```typescript
-interface ResultResponse {
-    status: {
-        action: string;
-        message: string;
-    };
-    data: {
-        type: string;
-        response: Array<ResponseItem>;
-    };
-}
-
-interface ResponseItem {
-    start: Date;
-    end: Date;
-    value: string;
-}
+```typescript 
+const isAvailable = this.healthData.isAvailable();
 ```
-In error case, you will receive this one:
+
+### `isAuthorized`
+This function (and the next one) takes an `Array` of `HealthDataType`'s. Each of those has a `name` and an `accessType`.
+
+- The `name` can be one of the ['Available Data Types'](#available-data-types).
+- The accessType can be one of `read`, `write`, or `readAndWrite`.
 
 ```typescript
-interface ErrorResponse {
-    action: string;
-    description: string;
-}
+this.healthData.isAuthorized([<HealthDataType>{name: "steps", accessType: "read"}])
+    .then(authorized => console.log(authorized);
+```
+
+### `requestAuthorization`
+This function takes the same argument as `isAuthorized`, and will trigger a consent screen in case the user hasn't previously authorized your app to access any of the passed `HealthDataType`'s.
+
+```typescript
+const types: Array<HealthDataType> = [
+	{name: "height", accessType: "write"},
+	{name: "weight", accessType: "readAndWrite"},
+	{name: "steps", accessType: "read"},
+	{name: "distance", accessType: "read"}
+];
+
+this.healthData.requestAuthorization(types)
+    .then(authorized => console.log(authorized)
+    .catch(error => console.log("Request auth error: ", error));
+```
+
+### `query`
+Mandatory properties are `startData`, `endDate`, and `dataType`.
+The `dataType` must be one of the ['Available Data Types'](#available-data-types).
+
+By default data is not aggregated, so all individual datapoints are returned.
+This plugin however offers a way to aggregate the data by either `hour`, `day`, or `sourceAndDay`,
+the latter will enable you to read daily data per source (Fitbit, Nike Run Club, manual entry, etc).
+
+```typescript
+this.healthData.query(
+    {
+      startDate: new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+      endDate: new Date(), // now
+      dataType: "steps", // equal to the 'name' property of 'HealthDataType'
+      unit: "count", // make sure this is compatible with the 'dataType' (see below)
+      aggregateBy: "day" // optional, one of: "hour", "day", "sourceAndDay"
+    })
+    .then(result => console.log(JSON.stringify(result)))
+    .catch(error => this.resultToShow = error);
 ```
 
 ## Available Data Types
-Unfortunatelly, this plugin is in the beginning. So, the capabilities are the possibles, for now.
+With version 1.0.0 these are the supported types of data you can read. Also, make sure you pass in the correct `unit`.
 
-| TypeOfData | GoogleFit Data Type | Apple HealthKit Data Type |
-| --- | --- | --- |
-| distance | TYPE_DISTANCE_DELTA | HKQuantityTypeIdentifierDistanceWalkingRunning |
-| steps | TYPE_STEP_COUNT_DELTA | HKQuantityTypeIdentifierStepCount |
-| calories | TYPE_CALORIES_EXPENDED | HKQuantityTypeIdentifierActiveEnergyBurned |
-| height | TYPE_HEIGHT | HKQuantityTypeIdentifierHeight |
-| weight | TYPE_WEIGHT | HKQuantityTypeIdentifierBodyMass |
-| heartRate | TYPE_HEART_RATE_BPM | HKQuantityTypeIdentifierHeartRate |
-| fatPercentage | TYPE_BODY_FAT_PERCENTAGE | HKQuantityTypeIdentifierBodyFatPercentage |
+Note that you are responsible for passing the correct `unit`, although there's only 1 option for each type. _Well actually, the `unit` is ignored on Android at the moment, and on iOS there are undocumented types you can pass in (fi. `mi` for `distance`)._
 
-I hope I can develop continuously to provide new common data types soon.
-However, if you really need other data types besides these ones, you can ask for them but not commonly. For example, if you need data about Systolic Blood Pressure, you can use this snippet, but you will only get success response message if you are using **iOS**.
+The reason is I intend to support more units per type, but that is yet to be implemented... so it's for the sake of future backward-compatibility! 🤯
 
-```typescript
-const configData = {
-    typeOfData: "bloodPressureSystolic"
-};
-
-this.healthData.getUncommonData(configData)
-	.then((fulfilled) => {
-    	console.log(fulfilled));
-	}).catch((error) => {
-		console.log(error);
-	});
-    
-```
-You can check available uncommon data in [iOS Plugin File](https://github.com/filipemendes1994/nativescript-health-data/blob/master/src/health-data.ios.ts)
+| TypeOfData | Unit | GoogleFit Data Type | Apple HealthKit Data Type |
+| --- | --- | --- | --- |
+| distance | m | `TYPE_DISTANCE_DELTA` | `HKQuantityTypeIdentifierDistanceWalkingRunning` |
+| steps | count | `TYPE_STEP_COUNT_DELTA` | `HKQuantityTypeIdentifierStepCount` |
+| calories | count | `TYPE_CALORIES_EXPENDED` | `HKQuantityTypeIdentifierActiveEnergyBurned` |
+| height | m | `TYPE_HEIGHT` | `HKQuantityTypeIdentifierHeight` |
+| weight | kg | `TYPE_WEIGHT` | `HKQuantityTypeIdentifierBodyMass` |
+| heartRate | count/min | `TYPE_HEART_RATE_BPM` | `HKQuantityTypeIdentifierHeartRate` |
+| fatPercentage | % | `TYPE_BODY_FAT_PERCENTAGE` | `HKQuantityTypeIdentifierBodyFatPercentage` |
 
 ## Credits
 * [Filipe Mendes](https://github.com/filipemendes1994/) for a superb first version of this repo, while working for SPMS, Shared Services for Ministry of Health (of Portugal). He kindly transferred this repo to me when he no longer had time to maintain it.

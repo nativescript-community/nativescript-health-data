@@ -2,8 +2,16 @@
 </ActionBar>
 <ScrollView>
     <StackLayout>
+        <Button ios:text="Apple Health Data available?" android:text="Google Fit Data available?" (tap)="isAvailable()"></Button>
+        <Button text="Is Authorized?" (tap)="isAuthorized()"></Button>
+        <Button text="Request Authorization" (tap)="requestAuthForVariousTypes()"></Button>
+        <Button text="Get Daily Steps per source (count)" (tap)="getData('steps', 'count', 'sourceAndDay')"></Button>
+        <Button text="Get Hourly Distance data (km)" (tap)="getData('distance', 'km', 'hour')"></Button>
+        <!--<Button text="Get Hourly Distance data (mi)" (tap)="getData('distance', 'mi', 'hour')"></Button>-->
+        <Button text="Get Height (m)" (tap)="getData('height', 'm')"></Button>
+        <Button text="Get Weight (kg)" (tap)="getData('weight', 'kg')"></Button>
+        <Button text="Get Heart Rate (count/min)" (tap)="getData('heartRate', 'count/min')"></Button>
+        <Button text="Get Fat percentage (%)" (tap)="getData('fatPercentage', '%')"></Button>
         <Label horizontalAlignment="center" [text]="resultToShow" textWrap="true"></Label>
-        <Button text="Create client" (tap)="createClient()"></Button>
-        <Button text="Get Something" (tap)="getData('')"></Button>
     </StackLayout>
 </ScrollView>

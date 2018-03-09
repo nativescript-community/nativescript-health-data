@@ -35,7 +35,7 @@ export class AppComponent {
           title: "Authentication result",
           message: (authorized ? "" : "Not ") + "authorized for " + JSON.stringify(AppComponent.TYPES),
           okButtonText: "Ok!"
-        }), 300))
+        }), 300));
   }
 
   requestAuthForVariousTypes(): void {

@@ -1,7 +1,7 @@
 import { AggregateBy, Common, HealthDataApi, HealthDataType, QueryRequest, ResponseItem } from './health-data.common';
 
 export class HealthData extends Common implements HealthDataApi {
-  healthStore: HKHealthStore;
+  private healthStore: HKHealthStore;
 
   constructor() {
     super();

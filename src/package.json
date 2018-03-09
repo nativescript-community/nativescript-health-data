@@ -12,8 +12,8 @@
   },
   "scripts": {
     "tsc": "tsc -skipLibCheck",
-    "test.android": "npm i && npm run tsc && npm run tslint && cd ../demo && tns build android && tns test android --justlaunch",
-    "test.ios": "npm i && npm run tsc && npm run tslint && cd ../demo && tns build ios && tns test ios --justlaunch",
+    "test.android": "npm i && npm run tsc && npm run tslint && cd ../demo-ng && tns build android && tns test android --justlaunch",
+    "test.ios": "npm i && npm run tsc && npm run tslint && cd ../demo-ng && tns build ios && tns test ios --justlaunch",
     "tslint": "cd .. && tslint \"**/*.ts\" --config tslint.json --exclude \"**/node_modules/**\"",
     "plugin.link": "npm link && cd ../demo-ng && npm link nativescript-health-data && cd ../src",
     "plugin.tscwatch": "npm run tsc -- -w",
@@ -24,7 +24,7 @@
     "demo.ng.ios.debug": "npm i && npm run tsc && cd ../demo-ng && tns debug ios",
     "demo.ng.android": "npm i && npm run tsc && cd ../demo-ng && tns run android --syncAllFiles",
     "plugin.ng.link": "npm link && cd ../demo-ng && npm link nativescript-health-data && cd ../src",
-    "setup": "npm i && npm run tsc && cd ../demo && npm i"
+    "setup": "npm i && npm run tsc && cd ../demo-ng && npm i"
   },
   "keywords": [
     "NativeScript",

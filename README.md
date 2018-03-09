@@ -1,8 +1,10 @@
 <p align="center">
-    <img src="./images/healthkit-googlefit.jpg" height="200px" style="border-radius: 10px">
+    <img src="./images/healthkit-googlefit.jpg" height="200px" />
 </p>
 
-<p align="center">
+# Health Data plugin for NativeScript
+This is a NativeScript plugin that abstracts Apple HealthKit and Google Fit to read health data from the user's device.
+
 [![Build Status][build-status]][build-url]
 [![NPM version][npm-image]][npm-url]
 [![Downloads][downloads-image]][npm-url]
@@ -15,10 +17,6 @@
 [downloads-image]:http://img.shields.io/npm/dm/nativescript-health-data.svg
 [twitter-image]:https://img.shields.io/twitter/follow/eddyverbruggen.svg?style=social&label=Follow%20me
 [twitter-url]:https://twitter.com/eddyverbruggen
-</p>
-
-#Health Data plugin for NativeScript
-This is a NativeScript plugin that abstracts Apple HealthKit and Google Fit to read health data from the user's device.
 
 ## Prerequisites (Android)
 Google Fit API Key - Go to the [Google Developers Console](https://console.developers.google.com/), create a project, and enable the `Fitness API`.

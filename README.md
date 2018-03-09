@@ -30,8 +30,7 @@ keytool -exportcert -keystore ~/.android/<debug or production>.keystore -list -v
 > Note that the default (debug) keystore password is empty.
 
 ## Installation
-
-Install the plugin using the NativeScript CLI
+Install the plugin using the NativeScript CLI:
 
 ```
 tns plugin add nativescript-health-data
@@ -65,7 +64,7 @@ const isAvailable = this.healthData.isAvailable();
 This function (and the next one) takes an `Array` of `HealthDataType`'s. Each of those has a `name` and an `accessType`.
 
 - The `name` can be one of the ['Available Data Types'](#available-data-types).
-- The accessType can be one of `read`, `write`, or `readAndWrite`.
+- The accessType can be one of `read`, `write`, or `readAndWrite` (note that this plugin currently only supports reading data, but that will change).
 
 ```typescript
 this.healthData.isAuthorized([<HealthDataType>{name: "steps", accessType: "read"}])
@@ -75,6 +74,8 @@ this.healthData.isAuthorized([<HealthDataType>{name: "steps", accessType: "read"
 ### `requestAuthorization`
 This function takes the same argument as `isAuthorized`, and will trigger a consent screen in case the user hasn't previously authorized your app to access any of the passed `HealthDataType`'s.
 
+Note that this plugin currently only supports reading data, but that will change.
+ 
 ```typescript
 const types: Array<HealthDataType> = [
 	{name: "height", accessType: "write"},

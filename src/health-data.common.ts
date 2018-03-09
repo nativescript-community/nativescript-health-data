@@ -25,6 +25,10 @@ export interface ResponseItem {
   start: Date;
   end: Date;
   value: number;
+  /**
+   * Added this, because on Android this may be different than what was requested
+   */
+  unit: string;
   source?: string;
 }
 
@@ -65,7 +69,7 @@ export interface HealthDataApi {
 
   requestAuthorization(types: Array<HealthDataType>): Promise<boolean>;
 
-  query(opts: QueryRequest): Promise<any>;
+  query(opts: QueryRequest): Promise<Array<ResponseItem>>;
 }
 
 export abstract class Common {

@@ -108,17 +108,21 @@ this.healthData.query(
 ```
 
 ## Available Data Types
-With version 1.0.0 these are the supported types of data you can read:
+With version 1.0.0 these are the supported types of data you can read. Also, make sure you pass in the correct `unit`.
 
-| TypeOfData | GoogleFit Data Type | Apple HealthKit Data Type |
-| --- | --- | --- |
-| distance | TYPE_DISTANCE_DELTA | HKQuantityTypeIdentifierDistanceWalkingRunning |
-| steps | TYPE_STEP_COUNT_DELTA | HKQuantityTypeIdentifierStepCount |
-| calories | TYPE_CALORIES_EXPENDED | HKQuantityTypeIdentifierActiveEnergyBurned |
-| height | TYPE_HEIGHT | HKQuantityTypeIdentifierHeight |
-| weight | TYPE_WEIGHT | HKQuantityTypeIdentifierBodyMass |
-| heartRate | TYPE_HEART_RATE_BPM | HKQuantityTypeIdentifierHeartRate |
-| fatPercentage | TYPE_BODY_FAT_PERCENTAGE | HKQuantityTypeIdentifierBodyFatPercentage |
+Note that you are responsible for passing the correct `unit`, although there's only 1 option for each type. _Well actually, the `unit` is ignored on Android at the moment, and on iOS there are undocumented types you can pass in (fi. `mi` for `distance`)._
+
+The reason is I intend to support more units per type, but that is yet to be implemented... so it's for the sake of future backward-compatibility! 🤯
+
+| TypeOfData | Unit | GoogleFit Data Type | Apple HealthKit Data Type |
+| --- | --- | --- | --- |
+| distance | m | `TYPE_DISTANCE_DELTA` | `HKQuantityTypeIdentifierDistanceWalkingRunning` |
+| steps | count | `TYPE_STEP_COUNT_DELTA` | `HKQuantityTypeIdentifierStepCount` |
+| calories | count | `TYPE_CALORIES_EXPENDED` | `HKQuantityTypeIdentifierActiveEnergyBurned` |
+| height | m | `TYPE_HEIGHT` | `HKQuantityTypeIdentifierHeight` |
+| weight | kg | `TYPE_WEIGHT` | `HKQuantityTypeIdentifierBodyMass` |
+| heartRate | count/min | `TYPE_HEART_RATE_BPM` | `HKQuantityTypeIdentifierHeartRate` |
+| fatPercentage | % | `TYPE_BODY_FAT_PERCENTAGE` | `HKQuantityTypeIdentifierBodyFatPercentage` |
 
 ## Credits
 * [Filipe Mendes](https://github.com/filipemendes1994/) for a superb first version of this repo, while working for SPMS, Shared Services for Ministry of Health (of Portugal). He kindly transferred this repo to me when he no longer had time to maintain it.

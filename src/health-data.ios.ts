@@ -60,7 +60,7 @@ export class HealthData extends Common implements HealthDataApi {
     });
   }
 
-  query(opts: QueryRequest): Promise<any> {
+  query(opts: QueryRequest): Promise<Array<ResponseItem>> {
     return new Promise((resolve, reject) => {
       let typeOfData = acceptableDataTypes[opts.dataType];
       if (quantityTypes[typeOfData] || categoryTypes[typeOfData]) {
@@ -71,10 +71,10 @@ export class HealthData extends Common implements HealthDataApi {
             resolve(res)
           }
         });
-      } else if (characteristicTypes[typeOfData]) {
-        resolve(this.queryForCharacteristicData(typeOfData));
+      // } else if (characteristicTypes[typeOfData]) {
+      //   resolve(this.queryForCharacteristicData(typeOfData));
       } else {
-        reject('Type not supported');
+        reject('Type not supported (yet)');
       }
     });
   }
@@ -114,6 +114,7 @@ export class HealthData extends Common implements HealthDataApi {
 
               const resultItem = <ResponseItem>{
                 source: source.name,
+                unit: unitString,
                 start: startDate,
                 end: endDate
               };

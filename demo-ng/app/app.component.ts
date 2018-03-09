@@ -12,7 +12,9 @@ export class AppComponent {
     {name: "height", accessType: "write"},
     {name: "weight", accessType: "readAndWrite"},
     {name: "steps", accessType: "read"},
-    {name: "distance", accessType: "read"}
+    {name: "distance", accessType: "read"},
+    {name: "heartRate", accessType: "read"},
+    {name: "fatPercentage", accessType: "read"}
   ];
 
   private healthData: HealthData;

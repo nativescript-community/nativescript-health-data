@@ -80,7 +80,7 @@ export class HealthData extends Common implements HealthDataApi {
   }
 
   // TODO how does Fit deal with unit conversion? mi <----> km, and such
-  query(opts: QueryRequest): Promise<any> {
+  query(opts: QueryRequest): Promise<Array<ResponseItem>> {
     return new Promise((resolve, reject) => {
       try {
         const readRequest = new DataReadRequest.Builder()
@@ -95,7 +95,7 @@ export class HealthData extends Common implements HealthDataApi {
             .readData(readRequest)
             .addOnSuccessListener(new com.google.android.gms.tasks.OnSuccessListener({
               onSuccess: (dataReadResponse: any /* com.google.android.gms.fitness.result.DataReadResponse */) => {
-                resolve(this.parseData(dataReadResponse.getResult(), opts.aggregateBy));
+                resolve(this.parseData(dataReadResponse.getResult(), opts));
               }
             }))
             .addOnFailureListener(new com.google.android.gms.tasks.OnFailureListener({
@@ -114,24 +114,24 @@ export class HealthData extends Common implements HealthDataApi {
     });
   }
 
-  private parseData(readResult: com.google.android.gms.fitness.result.DataReadResult, aggregateBy?: AggregateBy) {
+  private parseData(readResult: com.google.android.gms.fitness.result.DataReadResult, opts: QueryRequest) {
     let result = [];
     if (readResult.getBuckets().size() > 0) {
       for (let indexBucket = 0; indexBucket < readResult.getBuckets().size(); indexBucket++) {
         let dataSets = readResult.getBuckets().get(indexBucket).getDataSets();
         for (let indexDataSet = 0; indexDataSet < dataSets.size(); indexDataSet++) {
-          result = result.concat(this.dumpDataSet(dataSets.get(indexDataSet), aggregateBy));
+          result = result.concat(this.dumpDataSet(dataSets.get(indexDataSet), opts));
         }
       }
     } else if (readResult.getDataSets().size() > 0) {
       for (let index = 0; index < readResult.getDataSets().size(); index++) {
-        result = result.concat(this.dumpDataSet(readResult.getDataSets().get(index), aggregateBy));
+        result = result.concat(this.dumpDataSet(readResult.getDataSets().get(index), opts));
       }
     }
     return result;
   }
 
-  private dumpDataSet(dataSet: com.google.android.gms.fitness.data.DataSet, aggregateBy?: AggregateBy) {
+  private dumpDataSet(dataSet: com.google.android.gms.fitness.data.DataSet, opts: QueryRequest) {
     const parsedData: Array<ResponseItem> = [];
     const packageManager = getApplicationContext().getPackageManager();
     const packageToAppNameCache = new Map<string, string>();
@@ -143,6 +143,17 @@ export class HealthData extends Common implements HealthDataApi {
         let field = pos.getDataType().getFields().get(indexField);
         const value = pos.getValue(field);
 
+        // Note that the bit below is not yet required - per the README
+        /*
+        // Google Fit seems to have fixed unit types, so either:
+        // - convert these in the plugin, or
+        // - report the unit and have the user handle it (opting for this one for now)
+        let unit = opts.unit;
+        if (opts.dataType === "distance") {
+          unit = "m";
+        }
+        */
+
         const packageName = pos.getOriginalDataSource().getAppPackageName();
         let source = packageName ? packageName : pos.getOriginalDataSource().getStreamName();
         if (packageName) {
@@ -151,7 +162,7 @@ export class HealthData extends Common implements HealthDataApi {
               const appName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageName, android.content.pm.PackageManager.GET_META_DATA));
               packageToAppNameCache.set(packageName, appName);
             } catch (ignore) {
-              // the app has probably been unsintalled, so use the package name
+              // the app has probably been uninstalled, so use the package name
               packageToAppNameCache.set(packageName, packageName);
             }
           }
@@ -162,13 +173,14 @@ export class HealthData extends Common implements HealthDataApi {
           start: new Date(pos.getStartTime(TimeUnit.MILLISECONDS)),
           end: new Date(pos.getEndTime(TimeUnit.MILLISECONDS)),
           // https://developers.google.com/android/reference/com/google/android/gms/fitness/data/Value
-          value: value.getFormat() === 1 ? value.asInt() : value.asFloat(),
+          value: value.getFormat() === 1 ? value.asInt() : Math.round(value.asFloat() * 1000) / 1000,
+          unit: opts.unit,
           source: source
         });
       }
     }
 
-    return this.aggregate(parsedData, aggregateBy);
+    return this.aggregate(parsedData, opts.aggregateBy);
   }
 
   private getDataType(pluginType: string): com.google.android.gms.fitness.data.DataType {
@@ -182,8 +194,9 @@ const aggregatedDataTypes = {
   TYPE_STEP_COUNT_DELTA: DataType.AGGREGATE_STEP_COUNT_DELTA,
   TYPE_DISTANCE_DELTA: DataType.AGGREGATE_DISTANCE_DELTA,
   TYPE_CALORIES_EXPENDED: DataType.AGGREGATE_CALORIES_EXPENDED,
-  TYPE_HEIGHT: DataType.TYPE_HEIGHT, // TODO or AGGREGATE_HEIGHT_SUMMARY
-  TYPE_WEIGHT: DataType.AGGREGATE_WEIGHT_SUMMARY,
+  TYPE_HEIGHT: DataType.TYPE_HEIGHT,
+  // TYPE_WEIGHT: DataType.AGGREGATE_WEIGHT_SUMMARY,
+  TYPE_WEIGHT: DataType.TYPE_WEIGHT,
   TYPE_HEART_RATE_BPM: DataType.AGGREGATE_HEART_RATE_SUMMARY,
   TYPE_BODY_FAT_PERCENTAGE: DataType.AGGREGATE_BODY_FAT_PERCENTAGE_SUMMARY,
   TYPE_NUTRITION: DataType.AGGREGATE_NUTRITION_SUMMARY

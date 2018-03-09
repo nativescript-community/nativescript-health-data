@@ -182,7 +182,7 @@ export class HealthData extends Common implements HealthDataApi {
     return this.aggregate(parsedData, opts.aggregateBy);
   }
 
-  private getDataType(pluginType: string): com.google.android.gms.fitness.data.DataType {
+  private getDataType(pluginType: string): any /*com.google.android.gms.fitness.data.DataType */ {
     // TODO check if the passed type is ok
     const typeOfData = acceptableDataTypesForCommonity[pluginType];
     return aggregatedDataTypes[typeOfData];

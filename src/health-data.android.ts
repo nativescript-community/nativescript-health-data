@@ -18,14 +18,14 @@ const FitnessOptions = com.google.android.gms.fitness.FitnessOptions;
 const GoogleSignIn = com.google.android.gms.auth.api.signin.GoogleSignIn;
 
 export class HealthData extends Common implements HealthDataApi {
-  isAvailable(): Promise<boolean> {
+  isAvailable(updateGooglePlayServicesIfNeeded = true): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       const gApi = GoogleApiAvailability.getInstance();
       const apiResult = gApi.isGooglePlayServicesAvailable(utils.ad.getApplicationContext());
       const available = apiResult === com.google.android.gms.common.ConnectionResult.SUCCESS;
-      if (!available && gApi.isUserResolvableError(apiResult)) {
+      if (!available && updateGooglePlayServicesIfNeeded && gApi.isUserResolvableError(apiResult)) {
         // show a dialog offering the user to update (no need to wait for it to finish)
-        gApi.showErrorDialogFragment(application.android.foregroundActivity, apiResult, 1, new android.content.DialogInterface.OnCancelListener({
+        gApi.showErrorDialogFragment(application.android.foregroundActivity || application.android.startActivity, apiResult, 1, new android.content.DialogInterface.OnCancelListener({
           onCancel: dialogInterface => console.log("Google Play Services update dialog was canceled")
         }));
       }
@@ -81,31 +81,40 @@ export class HealthData extends Common implements HealthDataApi {
   query(opts: QueryRequest): Promise<Array<ResponseItem>> {
     return new Promise((resolve, reject) => {
       try {
-        const readRequest = new DataReadRequest.Builder()
-        // using 'read' instead of 'aggregate' for now, for more finegrain control
-        //     .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
-        //     .bucketByTime(1, TimeUnit.HOURS)
-            .read(this.getDataType(opts.dataType))
-            .setTimeRange(opts.startDate.getTime(), opts.endDate.getTime(), TimeUnit.MILLISECONDS)
-            .build();
+        // make sure the user is authorized
+        this.requestAuthorization([{ name: opts.dataType, accessType: "read"}]).then(authorized => {
+          if (!authorized) {
+            reject("Not authorized");
+            return;
+          }
 
-        Fitness.getHistoryClient(application.android.currentContext, GoogleSignIn.getLastSignedInAccount(application.android.currentContext))
-            .readData(readRequest)
-            .addOnSuccessListener(new com.google.android.gms.tasks.OnSuccessListener({
-              onSuccess: (dataReadResponse: any /* com.google.android.gms.fitness.result.DataReadResponse */) => {
-                resolve(this.parseData(dataReadResponse.getResult(), opts));
-              }
-            }))
-            .addOnFailureListener(new com.google.android.gms.tasks.OnFailureListener({
-              onFailure: (exception: any) => {
-                reject(exception.getMessage());
-              }
-            }))
-            .addOnCompleteListener(new com.google.android.gms.tasks.OnCompleteListener({
-              onComplete: (task: any) => {
-                // noop
-              }
-            }));
+          const readRequest = new DataReadRequest.Builder()
+          // using 'read' instead of 'aggregate' for now, for more finegrain control
+          //     .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
+          //     .bucketByTime(1, TimeUnit.HOURS)
+              .read(this.getDataType(opts.dataType))
+              .setTimeRange(opts.startDate.getTime(), opts.endDate.getTime(), TimeUnit.MILLISECONDS)
+              .build();
+
+          Fitness.getHistoryClient(application.android.currentContext, GoogleSignIn.getLastSignedInAccount(application.android.currentContext))
+              .readData(readRequest)
+              .addOnSuccessListener(new com.google.android.gms.tasks.OnSuccessListener({
+                onSuccess: (dataReadResponse: any /* com.google.android.gms.fitness.result.DataReadResponse */) => {
+                  resolve(this.parseData(dataReadResponse.getResult(), opts));
+                }
+              }))
+              .addOnFailureListener(new com.google.android.gms.tasks.OnFailureListener({
+                onFailure: (exception: any) => {
+                  reject(exception.getMessage());
+                }
+              }))
+              .addOnCompleteListener(new com.google.android.gms.tasks.OnCompleteListener({
+                onComplete: (task: any) => {
+                  // noop
+                }
+              }));
+        });
+
       } catch (e) {
         reject(e);
       }

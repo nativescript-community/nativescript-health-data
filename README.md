@@ -54,10 +54,12 @@ export class MyHealthyClass {
 ```
 
 ### `isAvailable`
-This function does not return a Promise; it resolves immediately, and tells you whether or not the device supports Health Data. On iOS this is probably always `true`. On Android the user will be prompted to (automatically) update their Play Services version in case it's not sufficiently up to date.
+This tells you whether or not the device supports Health Data. On iOS this is probably always `true`.
+On Android the user will be prompted to (automatically) update their Play Services version in case it's not sufficiently up to date.
+If you don't want this behavior, pass false to this function, as shown below.
 
 ```typescript
-this.healthData.isAvailable()
+this.healthData.isAvailable(false)
     .then(available => console.log(available));
 ```
 
@@ -97,6 +99,9 @@ The `dataType` must be one of the ['Available Data Types'](#available-data-types
 By default data is not aggregated, so all individual datapoints are returned.
 This plugin however offers a way to aggregate the data by either `hour`, `day`, or `sourceAndDay`,
 the latter will enable you to read daily data per source (Fitbit, Nike Run Club, manual entry, etc).
+
+If you didn't run `requestAuthorization` before running `query`,
+the plugin will run `requestAuthorization` for you (for the requested `dataType`). You're welcome. 😉 
 
 ```typescript
 this.healthData.query(

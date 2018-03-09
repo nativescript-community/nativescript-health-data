@@ -1,4 +1,4 @@
-import { AggregateBy, Common, HealthDataApi, HealthDataType, QueryRequest, ResponseItem } from './health-data.common';
+import { Common, HealthDataApi, HealthDataType, QueryRequest, ResponseItem } from './health-data.common';
 
 export class HealthData extends Common implements HealthDataApi {
   private healthStore: HKHealthStore;
@@ -10,7 +10,7 @@ export class HealthData extends Common implements HealthDataApi {
     }
   }
 
-  isAvailable(): Promise<boolean> {
+  isAvailable(updateGooglePlayServicesIfNeeded? /* for Android */: boolean): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       resolve(this.healthStore !== undefined);
     });
@@ -62,20 +62,28 @@ export class HealthData extends Common implements HealthDataApi {
 
   query(opts: QueryRequest): Promise<Array<ResponseItem>> {
     return new Promise((resolve, reject) => {
-      let typeOfData = acceptableDataTypes[opts.dataType];
-      if (quantityTypes[typeOfData] || categoryTypes[typeOfData]) {
-        this.queryForQuantityOrCategoryData(typeOfData, opts, (res, error) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(res);
-          }
-        });
-      // } else if (characteristicTypes[typeOfData]) {
-      //   resolve(this.queryForCharacteristicData(typeOfData));
-      } else {
-        reject('Type not supported (yet)');
-      }
+      // make sure the user is authorized
+      this.requestAuthorization([{ name: opts.dataType, accessType: "read"}]).then(authorized => {
+        if (!authorized) {
+          reject("Not authorized");
+          return;
+        }
+
+        let typeOfData = acceptableDataTypes[opts.dataType];
+        if (quantityTypes[typeOfData] || categoryTypes[typeOfData]) {
+          this.queryForQuantityOrCategoryData(typeOfData, opts, (res, error) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(res);
+            }
+          });
+          // } else if (characteristicTypes[typeOfData]) {
+          //   resolve(this.queryForCharacteristicData(typeOfData));
+        } else {
+          reject('Type not supported (yet)');
+        }
+      });
     });
   }
 

@@ -9,8 +9,8 @@ import { AggregateBy, HealthData, HealthDataType } from "nativescript-health-dat
 
 export class AppComponent {
   private static TYPES: Array<HealthDataType> = [
-    {name: "height", accessType: "write"},
-    {name: "weight", accessType: "readAndWrite"},
+    {name: "height", accessType: "read"},
+    {name: "weight", accessType: "readAndWrite"}, // just for show
     {name: "steps", accessType: "read"},
     {name: "distance", accessType: "read"},
     {name: "heartRate", accessType: "read"},
@@ -25,13 +25,17 @@ export class AppComponent {
   }
 
   isAvailable(): void {
-    this.healthData.isAvailable()
+    this.healthData.isAvailable(true)
         .then(available => this.resultToShow = available ? "Health Data available" : "Health Data not available :(");
   }
 
   isAuthorized(): void {
     this.healthData.isAuthorized([<HealthDataType>{name: "weight", accessType: "read"}])
-        .then(authorized => this.resultToShow = (authorized ? "" : "Not ") + "authorized for " + JSON.stringify(AppComponent.TYPES));
+        .then(authorized => setTimeout(() => alert({
+          title: "Authentication result",
+          message: (authorized ? "" : "Not ") + "authorized for " + JSON.stringify(AppComponent.TYPES),
+          okButtonText: "Ok!"
+        }), 300))
   }
 
   requestAuthForVariousTypes(): void {

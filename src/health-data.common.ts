@@ -75,7 +75,7 @@ export function createErrorResponse(action: string, description: string): ErrorR
 */
 
 export interface HealthDataApi {
-  isAvailable(): Promise<boolean>;
+  isAvailable(updateGooglePlayServicesIfNeeded? /* for Android, default true */: boolean): Promise<boolean>;
 
   isAuthorized(types: Array<HealthDataType>): Promise<boolean>;
 

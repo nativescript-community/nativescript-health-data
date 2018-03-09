@@ -13,12 +13,18 @@ export interface HealthDataType {
 
 export type AggregateBy = "hour" | "day" | "sourceAndDay";
 
+export type SortOrder = "asc" | "desc";
+
 export interface QueryRequest {
   startDate: Date;
   endDate: Date;
   dataType: string;
-  aggregateBy?: AggregateBy;
   unit: string;
+  aggregateBy?: AggregateBy;
+  /**
+   * Default "asc"
+   */
+  sortOrder?: SortOrder;
 }
 
 export interface ResponseItem {
@@ -32,6 +38,7 @@ export interface ResponseItem {
   source?: string;
 }
 
+/*
 export interface ResultResponse {
   status: {
     action: string;
@@ -61,6 +68,7 @@ export function createResultResponse(action: string, message: string, type?: str
 export function createErrorResponse(action: string, description: string): ErrorResponse {
   return {action, description};
 }
+*/
 
 export interface HealthDataApi {
   isAvailable(): Promise<boolean>;

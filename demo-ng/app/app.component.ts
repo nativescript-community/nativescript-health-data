@@ -50,7 +50,8 @@ export class AppComponent {
           endDate: new Date(), // now
           dataType: dataType,
           unit: unit,
-          aggregateBy: aggregateBy
+          aggregateBy: aggregateBy,
+          sortOrder: "desc"
         })
         .then(result => {
           console.log(JSON.stringify(result));

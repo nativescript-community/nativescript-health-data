@@ -78,7 +78,6 @@ export class HealthData extends Common implements HealthDataApi {
     });
   }
 
-  // TODO how does Fit deal with unit conversion? mi <----> km, and such
   query(opts: QueryRequest): Promise<Array<ResponseItem>> {
     return new Promise((resolve, reject) => {
       try {
@@ -127,6 +126,12 @@ export class HealthData extends Common implements HealthDataApi {
         result = result.concat(this.dumpDataSet(readResult.getDataSets().get(index), opts));
       }
     }
+
+    // the result is sorted asc, so reverse in case that was requested
+    if (opts.sortOrder === "desc") {
+      result = result.reverse();
+    }
+
     return result;
   }
 

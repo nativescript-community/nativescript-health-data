@@ -104,7 +104,8 @@ this.healthData.query(
       endDate: new Date(), // now
       dataType: "steps", // equal to the 'name' property of 'HealthDataType'
       unit: "count", // make sure this is compatible with the 'dataType' (see below)
-      aggregateBy: "day" // optional, one of: "hour", "day", "sourceAndDay"
+      aggregateBy: "day", // optional, one of: "hour", "day", "sourceAndDay"
+      sortOrder: "desc" // optional, default "asc"
     })
     .then(result => console.log(JSON.stringify(result)))
     .catch(error => this.resultToShow = error);

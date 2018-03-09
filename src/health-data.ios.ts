@@ -64,7 +64,7 @@ export class HealthData extends Common implements HealthDataApi {
     return new Promise((resolve, reject) => {
       let typeOfData = acceptableDataTypes[opts.dataType];
       if (quantityTypes[typeOfData] || categoryTypes[typeOfData]) {
-        this.queryForQuantityOrCategoryData(typeOfData, opts.startDate, opts.endDate, opts.aggregateBy, opts.unit, (res, error) => {
+        this.queryForQuantityOrCategoryData(typeOfData, opts, (res, error) => {
           if (error) {
             reject(error);
           } else {
@@ -92,16 +92,16 @@ export class HealthData extends Common implements HealthDataApi {
     }
   }
 
-  private queryForQuantityOrCategoryData(dataType: string, start: Date, end: Date, aggregateBy: AggregateBy, unitString: string, callback: (data: Array<ResponseItem>, error: string) => void) {
+  private queryForQuantityOrCategoryData(dataType: string, opts: QueryRequest, callback: (data: Array<ResponseItem>, error: string) => void) {
     let objectType = this.resolveDataType(dataType);
 
-    const predicate = HKQuery.predicateForSamplesWithStartDateEndDateOptions(start, end, HKQueryOptions.StrictStartDate);
+    const predicate = HKQuery.predicateForSamplesWithStartDateEndDateOptions(opts.startDate, opts.endDate, HKQueryOptions.StrictStartDate);
 
-    let endDateSortDescriptor = NSSortDescriptor.alloc().initWithKeyAscending(HKSampleSortIdentifierEndDate, true);
+    let endDateSortDescriptor = NSSortDescriptor.alloc().initWithKeyAscending(HKSampleSortIdentifierEndDate, opts.sortOrder !== "desc");
     const sortBy = NSArray.arrayWithObject<NSSortDescriptor>(endDateSortDescriptor);
 
     // note that passing an invalid 'unitString' will crash the app (can't catch that error either)
-    const unit = HKUnit.unitFromString(unitString);
+    const unit = HKUnit.unitFromString(opts.unit);
 
     let query = HKSampleQuery.alloc().initWithSampleTypePredicateLimitSortDescriptorsResultsHandler(
         objectType, predicate, null, sortBy, (query: HKSampleQuery, listResults: NSArray<HKSample>, error: NSError) => {
@@ -114,7 +114,7 @@ export class HealthData extends Common implements HealthDataApi {
 
               const resultItem = <ResponseItem>{
                 source: source.name,
-                unit: unitString,
+                unit: opts.unit,
                 start: startDate,
                 end: endDate
               };
@@ -124,14 +124,14 @@ export class HealthData extends Common implements HealthDataApi {
                 if ((<HKQuantitySample>sample).quantity.isCompatibleWithUnit(unit)) {
                   resultItem.value = (<HKQuantitySample>sample).quantity.doubleValueForUnit(unit);
                 } else {
-                  console.log("Incompatible unit passed: " + unitString + " (" + unit + ")");
+                  console.log("Incompatible unit passed: " + opts.unit + " (" + unit + ")");
                 }
               }
 
               parsedData.push(resultItem);
             }
 
-            callback(this.aggregate(parsedData, aggregateBy), null);
+            callback(this.aggregate(parsedData, opts.aggregateBy), null);
           } else {
             console.dir(error);
             callback(null, error.localizedDescription);

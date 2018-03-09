@@ -1,5 +1,4 @@
-/// <reference path="./android.def.d.ts" />
-import { AggregateBy, Common, HealthDataApi, HealthDataType, QueryRequest, ResponseItem } from './health-data.common';
+import { Common, HealthDataApi, HealthDataType, QueryRequest, ResponseItem } from './health-data.common';
 import * as utils from 'tns-core-modules/utils/utils';
 import { ad } from 'tns-core-modules/utils/utils';
 import * as application from 'tns-core-modules/application';
@@ -114,7 +113,7 @@ export class HealthData extends Common implements HealthDataApi {
     });
   }
 
-  private parseData(readResult: com.google.android.gms.fitness.result.DataReadResult, opts: QueryRequest) {
+  private parseData(readResult: any /* com.google.android.gms.fitness.result.DataReadResult */, opts: QueryRequest) {
     let result = [];
     if (readResult.getBuckets().size() > 0) {
       for (let indexBucket = 0; indexBucket < readResult.getBuckets().size(); indexBucket++) {
@@ -131,7 +130,7 @@ export class HealthData extends Common implements HealthDataApi {
     return result;
   }
 
-  private dumpDataSet(dataSet: com.google.android.gms.fitness.data.DataSet, opts: QueryRequest) {
+  private dumpDataSet(dataSet: any /* com.google.android.gms.fitness.data.DataSet */, opts: QueryRequest) {
     const parsedData: Array<ResponseItem> = [];
     const packageManager = getApplicationContext().getPackageManager();
     const packageToAppNameCache = new Map<string, string>();

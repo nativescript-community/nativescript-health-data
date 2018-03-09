@@ -68,7 +68,7 @@ export class HealthData extends Common implements HealthDataApi {
           if (error) {
             reject(error);
           } else {
-            resolve(res)
+            resolve(res);
           }
         });
       // } else if (characteristicTypes[typeOfData]) {
@@ -122,7 +122,7 @@ export class HealthData extends Common implements HealthDataApi {
               // TODO other types, see https://github.com/Telerik-Verified-Plugins/HealthKit/blob/c6b15ea8096bae3e61dc71a3cb0098da44f411fd/src/ios/HealthKit.m#L1333
               if (sample instanceof HKQuantitySample) {
                 if ((<HKQuantitySample>sample).quantity.isCompatibleWithUnit(unit)) {
-                  resultItem.value = (<HKQuantitySample>sample).quantity.doubleValueForUnit(unit)
+                  resultItem.value = (<HKQuantitySample>sample).quantity.doubleValueForUnit(unit);
                 } else {
                   console.log("Incompatible unit passed: " + unitString + " (" + unit + ")");
                 }

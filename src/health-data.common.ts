@@ -8,7 +8,7 @@ export interface ConfigurationData {
 
 export interface HealthDataType {
   name: string;
-  accessType: "read" | "write" | "readAndWrite"
+  accessType: "read" | "write" | "readAndWrite";
 }
 
 export type AggregateBy = "hour" | "day" | "sourceAndDay";
@@ -100,7 +100,7 @@ export abstract class Common {
           start: item.start,
           end: item.end,
           value: item.value
-        })
+        });
       } else {
         result[result.length - 1].value += item.value;
         result[result.length - 1].end = item.end;

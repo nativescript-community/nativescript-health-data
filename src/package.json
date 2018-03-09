@@ -14,7 +14,7 @@
     "tsc": "tsc -skipLibCheck",
     "test.android": "npm i && npm run tsc && npm run tslint && cd ../demo-ng && tns build android && tns test android --justlaunch",
     "test.ios": "npm i && npm run tsc && npm run tslint && cd ../demo-ng && tns build ios && tns test ios --justlaunch",
-    "tslint": "cd .. && tslint \"**/*.ts\" --config tslint.json --exclude \"**/node_modules/**\"",
+    "tslint": "cd .. && tslint \"**/*.ts\" --config tslint.json --exclude \"**/node_modules/**\" --exclude \"demo-ng/platforms/**\"",
     "plugin.link": "npm link && cd ../demo-ng && npm link nativescript-health-data && cd ../src",
     "plugin.tscwatch": "npm run tsc -- -w",
     "demo.ios": "npm i && npm run tsc && cd ../demo && tns run ios --syncAllFiles",

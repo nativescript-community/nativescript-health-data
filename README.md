@@ -56,8 +56,9 @@ export class MyHealthyClass {
 ### `isAvailable`
 This function does not return a Promise; it resolves immediately, and tells you whether or not the device supports Health Data. On iOS this is probably always `true`. On Android the user will be prompted to (automatically) update their Play Services version in case it's not sufficiently up to date.
 
-```typescript 
-const isAvailable = this.healthData.isAvailable();
+```typescript
+this.healthData.isAvailable()
+    .then(available => console.log(available));
 ```
 
 ### `isAuthorized`
@@ -68,7 +69,7 @@ This function (and the next one) takes an `Array` of `HealthDataType`'s. Each of
 
 ```typescript
 this.healthData.isAuthorized([<HealthDataType>{name: "steps", accessType: "read"}])
-    .then(authorized => console.log(authorized);
+    .then(authorized => console.log(authorized));
 ```
 
 ### `requestAuthorization`
@@ -85,7 +86,7 @@ const types: Array<HealthDataType> = [
 ];
 
 this.healthData.requestAuthorization(types)
-    .then(authorized => console.log(authorized)
+    .then(authorized => console.log(authorized))
     .catch(error => console.log("Request auth error: ", error));
 ```
 

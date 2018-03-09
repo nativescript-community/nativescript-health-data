@@ -25,7 +25,8 @@ export class AppComponent {
   }
 
   isAvailable(): void {
-    this.resultToShow = this.healthData.isAvailable() ? "Health Data available" : "Health Data not available :(";
+    this.healthData.isAvailable()
+        .then(available => this.resultToShow = available ? "Health Data available" : "Health Data not available :(");
   }
 
   isAuthorized(): void {

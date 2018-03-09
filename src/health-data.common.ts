@@ -25,6 +25,10 @@ export interface QueryRequest {
    * Default "asc"
    */
   sortOrder?: SortOrder;
+  /**
+   * Default undefined, so whatever the platform limit is.
+   */
+  limit?: number;
 }
 
 export interface ResponseItem {

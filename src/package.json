@@ -23,7 +23,8 @@
     "demo.ng.ios": "npm i && npm run tsc && cd ../demo-ng && tns run ios --syncAllFiles",
     "demo.ng.ios.debug": "npm i && npm run tsc && cd ../demo-ng && tns debug ios",
     "demo.ng.android": "npm i && npm run tsc && cd ../demo-ng && tns run android --syncAllFiles",
-    "plugin.ng.link": "npm link && cd ../demo-ng && npm link nativescript-health-data && cd ../src"
+    "plugin.ng.link": "npm link && cd ../demo-ng && npm link nativescript-health-data && cd ../src",
+    "setup": "npm i && npm run tsc && cd ../demo && npm i"
   },
   "keywords": [
     "NativeScript",

@@ -119,24 +119,28 @@ this.healthData.query(
 
 
 ### `startMonitoring` (iOS only, for now)
-If you want to be notified when health data was changed, you can monitor specific types. This even works when your app is in the background, with `enableBackgroundUpdates: true`. Note that iOS will wake up your app so you can act upon this notification (in the `onUpdate` function by fi. querying recent changes to this data type), but in return you are responsible for telling iOS you're done. So make sure you invoke the `completionHandler` as shown below.
+If you want to be notified when health data was changed, you can monitor specific types.
+This even works when your app is in the background, with `enableBackgroundUpdates: true`.
+Note that iOS will wake up your app so you can act upon this notification (in the `onUpdate` function by fi. querying recent changes to this data type),
+but in return you are responsible for telling iOS you're done. So make sure you invoke the `completionHandler` as shown below.
 
-Not all data types support `backgroundUpdateFrequency: "immediate"`, so your app may not always be invoked immediately when data is added/deleted in HealthKit.
+Not all data types support `backgroundUpdateFrequency: "immediate"`,
+so your app may not always be invoked immediately when data is added/deleted in HealthKit.
 
 > Background notifications probably don't work on the iOS simulator, so please test those on a real device.
 
 ```typescript
 this.healthData.startMonitoring(
     {
-      dataType: dataType,
+      dataType: "heartRate",
       enableBackgroundUpdates: true,
       backgroundUpdateFrequency: "immediate",
       onUpdate: (completionHandler: () => void) => {
         console.log("Our app was notified that health data changed, so querying...");
-        this.getData(dataType, unit).then(() => completionHandler());
+        this.getData("heartRate", "count/min").then(() => completionHandler());
       }
     })
-    .then(() => this.resultToShow = `Started monitoring ${dataType}`)
+    .then(() => this.resultToShow = `Started monitoring heartRate`)
     .catch(error => this.resultToShow = error);
 ```
 
@@ -146,9 +150,9 @@ It's best to call this method in case you no longer wish to receive notification
 ```typescript
 this.healthData.stopMonitoring(
     {
-      dataType: dataType,
+      dataType: "heartRate",
     })
-    .then(() => this.resultToShow = `Stopped monitoring ${dataType}`)
+    .then(() => this.resultToShow = `Stopped monitoring heartRate`)
     .catch(error => this.resultToShow = error);
 ```
 

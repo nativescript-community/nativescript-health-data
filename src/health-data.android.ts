@@ -1,4 +1,12 @@
-import { Common, HealthDataApi, HealthDataType, QueryRequest, ResponseItem } from './health-data.common';
+import {
+  Common,
+  HealthDataApi,
+  HealthDataType,
+  QueryRequest,
+  ResponseItem,
+  StartMonitoringRequest,
+  StopMonitoringRequest
+} from './health-data.common';
 import * as utils from 'tns-core-modules/utils/utils';
 import { ad } from 'tns-core-modules/utils/utils';
 import * as application from 'tns-core-modules/application';
@@ -82,7 +90,7 @@ export class HealthData extends Common implements HealthDataApi {
     return new Promise((resolve, reject) => {
       try {
         // make sure the user is authorized
-        this.requestAuthorization([{ name: opts.dataType, accessType: "read"}]).then(authorized => {
+        this.requestAuthorization([{name: opts.dataType, accessType: "read"}]).then(authorized => {
           if (!authorized) {
             reject("Not authorized");
             return;
@@ -118,6 +126,18 @@ export class HealthData extends Common implements HealthDataApi {
       } catch (e) {
         reject(e);
       }
+    });
+  }
+
+  startMonitoring(opts: StartMonitoringRequest): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      reject("Not supported");
+    });
+  }
+
+  stopMonitoring(opts: StopMonitoringRequest): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      reject("Not supported");
     });
   }
 

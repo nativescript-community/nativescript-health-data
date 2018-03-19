@@ -117,6 +117,41 @@ this.healthData.query(
     .catch(error => this.resultToShow = error);
 ```
 
+
+### `startMonitoring` (iOS only, for now)
+If you want to be notified when health data was changed, you can monitor specific types. This even works when your app is in the background, with `enableBackgroundUpdates: true`. Note that iOS will wake up your app so you can act upon this notification (in the `onUpdate` function by fi. querying recent changes to this data type), but in return you are responsible for telling iOS you're done. So make sure you invoke the `completionHandler` as shown below.
+
+Not all data types support `backgroundUpdateFrequency: "immediate"`, so your app may not always be invoked immediately when data is added/deleted in HealthKit.
+
+> Background notifications probably don't work on the iOS simulator, so please test those on a real device.
+
+```typescript
+this.healthData.startMonitoring(
+    {
+      dataType: dataType,
+      enableBackgroundUpdates: true,
+      backgroundUpdateFrequency: "immediate",
+      onUpdate: (completionHandler: () => void) => {
+        console.log("Our app was notified that health data changed, so querying...");
+        this.getData(dataType, unit).then(() => completionHandler());
+      }
+    })
+    .then(() => this.resultToShow = `Started monitoring ${dataType}`)
+    .catch(error => this.resultToShow = error);
+```
+
+### `stopMonitoring` (iOS only, for now)
+It's best to call this method in case you no longer wish to receive notifications when health data changes.
+
+```typescript
+this.healthData.stopMonitoring(
+    {
+      dataType: dataType,
+    })
+    .then(() => this.resultToShow = `Stopped monitoring ${dataType}`)
+    .catch(error => this.resultToShow = error);
+```
+
 ## Available Data Types
 With version 1.0.0 these are the supported types of data you can read. Also, make sure you pass in the correct `unit`.
 

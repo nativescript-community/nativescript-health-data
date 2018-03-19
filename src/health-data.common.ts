@@ -13,6 +13,8 @@ export interface HealthDataType {
 
 export type AggregateBy = "hour" | "day" | "sourceAndDay";
 
+export type BackgroundUpdateFrequency = "immediate" | "hourly" | "daily" | "weekly";
+
 export type SortOrder = "asc" | "desc";
 
 export interface QueryRequest {
@@ -29,6 +31,28 @@ export interface QueryRequest {
    * Default undefined, so whatever the platform limit is.
    */
   limit?: number;
+}
+
+export interface StartMonitoringRequest {
+  /**
+   * Default false
+   */
+  enableBackgroundUpdates?: boolean;
+  /**
+   * Default 'immediate', only relevant when 'enableBackgroundUpdates' is 'true'.
+   */
+  backgroundUpdateFrequency?: BackgroundUpdateFrequency;
+  dataType: string;
+  /**
+   * This callback function is invoked when the health store receives an update (add/delete data).
+   * You can use this trigger to fetch the latest data.
+   */
+  onUpdate: (completionHandler: () => void) => void;
+  onError?: (error: string) => void;
+}
+
+export interface StopMonitoringRequest {
+  dataType?: string;
 }
 
 export interface ResponseItem {
@@ -82,6 +106,10 @@ export interface HealthDataApi {
   requestAuthorization(types: Array<HealthDataType>): Promise<boolean>;
 
   query(opts: QueryRequest): Promise<Array<ResponseItem>>;
+
+  startMonitoring(opts: StartMonitoringRequest): Promise<void>;
+
+  stopMonitoring(opts: StopMonitoringRequest): Promise<void>;
 }
 
 export abstract class Common {

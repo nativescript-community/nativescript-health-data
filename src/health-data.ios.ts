@@ -1,7 +1,17 @@
-import { Common, HealthDataApi, HealthDataType, QueryRequest, ResponseItem } from './health-data.common';
+import {
+  BackgroundUpdateFrequency,
+  Common,
+  HealthDataApi,
+  HealthDataType,
+  QueryRequest,
+  ResponseItem,
+  StartMonitoringRequest,
+  StopMonitoringRequest
+} from './health-data.common';
 
 export class HealthData extends Common implements HealthDataApi {
   private healthStore: HKHealthStore;
+  private monitorQueries: Map<string /* type */, HKObserverQuery> = new Map();
 
   constructor() {
     super();
@@ -63,7 +73,7 @@ export class HealthData extends Common implements HealthDataApi {
   query(opts: QueryRequest): Promise<Array<ResponseItem>> {
     return new Promise((resolve, reject) => {
       // make sure the user is authorized
-      this.requestAuthorization([{ name: opts.dataType, accessType: "read"}]).then(authorized => {
+      this.requestAuthorization([{name: opts.dataType, accessType: "read"}]).then(authorized => {
         if (!authorized) {
           reject("Not authorized");
           return;
@@ -87,6 +97,49 @@ export class HealthData extends Common implements HealthDataApi {
     });
   }
 
+  startMonitoring(opts: StartMonitoringRequest): Promise<void> {
+    return new Promise((resolve, reject) => {
+      // make sure the user is authorized
+      this.requestAuthorization([{name: opts.dataType, accessType: "read"}]).then(authorized => {
+        if (!authorized) {
+          reject("Not authorized");
+          return;
+        }
+
+        let typeOfData = acceptableDataTypes[opts.dataType];
+        if (quantityTypes[typeOfData] || categoryTypes[typeOfData]) {
+          this.monitorData(typeOfData, opts);
+          resolve();
+        } else {
+          reject('Type not supported (yet)');
+        }
+      });
+    });
+  }
+
+  stopMonitoring(opts: StopMonitoringRequest): Promise<void> {
+    return new Promise((resolve, reject) => {
+      let typeOfData = acceptableDataTypes[opts.dataType];
+      const objectType = this.resolveDataType(typeOfData);
+
+      if (quantityTypes[typeOfData] || categoryTypes[typeOfData]) {
+
+        const rememberedQuery = this.monitorQueries.get(opts.dataType);
+        if (rememberedQuery) {
+          this.healthStore.stopQuery(rememberedQuery);
+          this.monitorQueries.delete(opts.dataType);
+        }
+
+        this.healthStore.disableBackgroundDeliveryForTypeWithCompletion(
+            objectType, (success: boolean, error: NSError) => {
+              success ? resolve() : reject(error.localizedDescription);
+            });
+      } else {
+        reject('Type not supported (yet)');
+      }
+    });
+  }
+
   private resolveDataType(type: string): HKObjectType {
     if (quantityTypes[type]) {
       return HKObjectType.quantityTypeForIdentifier(quantityTypes[type]);
@@ -101,7 +154,7 @@ export class HealthData extends Common implements HealthDataApi {
   }
 
   private queryForQuantityOrCategoryData(dataType: string, opts: QueryRequest, callback: (data: Array<ResponseItem>, error: string) => void) {
-    let objectType = this.resolveDataType(dataType);
+    const objectType = this.resolveDataType(dataType);
 
     const predicate = HKQuery.predicateForSamplesWithStartDateEndDateOptions(opts.startDate, opts.endDate, HKQueryOptions.StrictStartDate);
 
@@ -148,6 +201,48 @@ export class HealthData extends Common implements HealthDataApi {
     );
     this.healthStore.executeQuery(query);
   }
+
+  private monitorData(dataType: string, opts: StartMonitoringRequest): void {
+    const objectType = this.resolveDataType(dataType);
+
+    let query = HKObserverQuery.alloc().initWithSampleTypePredicateUpdateHandler(
+        objectType, null, (observerQuery: HKObserverQuery, handler: () => void, error: NSError) => {
+          if (error) {
+            opts.onError(error.localizedDescription);
+            handler();
+          } else {
+            // We need to tell iOS when our app is done background processing by calling the handler
+            opts.onUpdate(() => handler());
+          }
+        }
+    );
+
+    // remember this query, so we can stop it at a later time
+    this.monitorQueries.set(opts.dataType, query);
+
+    this.healthStore.executeQuery(query);
+
+    if (opts.enableBackgroundUpdates) {
+      this.healthStore.enableBackgroundDeliveryForTypeFrequencyWithCompletion(
+          objectType, this.getHKUpdateFrequency(opts.backgroundUpdateFrequency), (success: boolean, error: NSError) => {
+            if (!success) {
+              opts.onError(error.localizedDescription);
+            }
+          });
+    }
+  }
+
+  private getHKUpdateFrequency(frequency: BackgroundUpdateFrequency): HKUpdateFrequency {
+    if (frequency === "weekly") {
+      return HKUpdateFrequency.Weekly;
+    } else if (frequency === "daily") {
+      return HKUpdateFrequency.Daily;
+    } else if (frequency === "hourly") {
+      return HKUpdateFrequency.Hourly;
+    } else {
+      return HKUpdateFrequency.Immediate;
+    }
+  };
 
   private queryForCharacteristicData(dataType: string) {
     // console.log('ask for characteristic data ' + data);

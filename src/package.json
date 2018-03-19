@@ -1,6 +1,6 @@
 {
   "name": "nativescript-health-data",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Health Data plugin for Nativescript, using Google Fit and Apple HealthKit.",
   "main": "health-data",
   "typings": "index.d.ts",

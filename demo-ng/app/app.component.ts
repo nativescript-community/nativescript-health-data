@@ -61,7 +61,7 @@ export class AppComponent {
         .then(result => {
           this.zone.run(() => {
             console.log(JSON.stringify(result));
-            this.resultToShow = JSON.stringify(result)
+            this.resultToShow = JSON.stringify(result);
           });
         })
         .catch(error => this.resultToShow = error);

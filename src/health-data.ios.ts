@@ -242,7 +242,7 @@ export class HealthData extends Common implements HealthDataApi {
     } else {
       return HKUpdateFrequency.Immediate;
     }
-  };
+  }
 
   private queryForCharacteristicData(dataType: string) {
     // console.log('ask for characteristic data ' + data);

@@ -18,7 +18,9 @@ This is a NativeScript plugin that abstracts Apple HealthKit and Google Fit to r
 [twitter-image]:https://img.shields.io/twitter/follow/eddyverbruggen.svg?style=social&label=Follow%20me
 [twitter-url]:https://twitter.com/eddyverbruggen
 
-## Prerequisites (Android)
+## Prerequisites
+
+### Android
 Google Fit API Key - Go to the [Google Developers Console](https://console.developers.google.com/), create a project, and enable the `Fitness API`.
 Then under `Credentials`, create a `Fitness API` OAuth2 client ID for an Android App (select `User data` and press the `What credentials do I need?` button).
 If you are using Linux/maxOS, generate your SHA1-key with the code below.
@@ -28,6 +30,9 @@ keytool -exportcert -keystore ~/.android/<debug or production>.keystore -list -v
 ```
 
 > Note that the default (debug) keystore password is empty.
+
+### iOS
+Make sure you enable the `HealthKit` entitlement in your app ID.
 
 ## Installation
 Install the plugin using the NativeScript CLI:
@@ -68,6 +73,8 @@ This function (and the next one) takes an `Array` of `HealthDataType`'s. Each of
 
 - The `name` can be one of the ['Available Data Types'](#available-data-types).
 - The accessType can be one of `read`, `write`, or `readAndWrite` (note that this plugin currently only supports reading data, but that will change).
+
+> iOS is a bit silly here: if you've only requested 'read' access, you'll never get a `true` response from this method. [Details here.](https://stackoverflow.com/a/29128231/2596974)
 
 ```typescript
 this.healthData.isAuthorized([<HealthDataType>{name: "steps", accessType: "read"}])

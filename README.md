@@ -26,7 +26,7 @@ Then under `Credentials`, create a `Fitness API` OAuth2 client ID for an Android
 If you are using Linux/maxOS, generate your SHA1-key with the code below.
 
 ```shell
-keytool -exportcert -keystore ~/.android/<debug or production>.keystore -list -v
+keytool -exportcert -keystore path-to-debug-or-production-keystore -list -v
 ```
 
 > Note that the default (debug) keystore password is empty.

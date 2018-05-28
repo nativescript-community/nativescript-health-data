@@ -27,12 +27,6 @@ const GoogleSignIn = com.google.android.gms.auth.api.signin.GoogleSignIn;
 
 export class HealthData extends Common implements HealthDataApi {
 
-  private permissionsNeeded = [
-    android.Manifest.permission.ACCESS_FINE_LOCATION,
-    android.Manifest.permission.ACCESS_NETWORK_STATE,
-    android.Manifest.permission.GET_ACCOUNTS,
-    android.Manifest.permission.BODY_SENSORS];
-
   isAvailable(updateGooglePlayServicesIfNeeded = true): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       const gApi = GoogleApiAvailability.getInstance();
@@ -238,7 +232,7 @@ export class HealthData extends Common implements HealthDataApi {
   }
 
   private requestHardwarePermissions(): Promise<boolean> {
-     this.requestPermissionFor(this.permissionsNeeded
+     this.requestPermissionFor(this.permissionsNeeded()
         .filter(permission => !this.wasPermissionGranted(permission)));
         return Promise.resolve(this.wasPermissionsGrantedForAll());
   }
@@ -254,7 +248,7 @@ export class HealthData extends Common implements HealthDataApi {
   }
 
   private wasPermissionsGrantedForAll(): boolean {
-      return this.permissionsNeeded.every(permission => this.wasPermissionGranted(permission));
+      return this.permissionsNeeded().every(permission => this.wasPermissionGranted(permission));
   }
 
   private requestPermissionFor(permissions: any[]) {
@@ -263,6 +257,19 @@ export class HealthData extends Common implements HealthDataApi {
       application.android.foregroundActivity,
       permissions, 234
     );
+  }
+
+  private permissionsNeeded(): any[] {
+    let permissions = [
+      android.Manifest.permission.ACCESS_FINE_LOCATION,
+      android.Manifest.permission.ACCESS_NETWORK_STATE,
+      android.Manifest.permission.GET_ACCOUNTS];
+
+    if (android.os.Build.VERSION.SDK_INT > 19) {
+      permissions.push(android.Manifest.permission.BODY_SENSORS);
+    }
+
+    return permissions;
   }
 }
 

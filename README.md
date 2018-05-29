@@ -31,6 +31,8 @@ keytool -exportcert -keystore path-to-debug-or-production-keystore -list -v
 
 > Note that the default (debug) keystore password is empty.
 
+Enter the android package name. The `package` name is the android app name which is in the *package.json* under the `nativescript` object as the `id` property.
+
 ### iOS
 Make sure you enable the `HealthKit` entitlement in your app ID.
 

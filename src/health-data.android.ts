@@ -52,17 +52,16 @@ export class HealthData extends Common implements HealthDataApi {
           .forEach(t => fitnessOptionsBuilder.addDataType(this.getDataType(t.name), FitnessOptions.ACCESS_WRITE));
 
       resolve(GoogleSignIn.hasPermissions(
-          GoogleSignIn.getLastSignedInAccount(application.android.currentContext),
+          GoogleSignIn.getLastSignedInAccount(getApplicationContext()),
           fitnessOptionsBuilder.build()));
     });
   }
 
   requestAuthorization(types: Array<HealthDataType>): Promise<boolean> {
-    return this.requestHardwarePermissions().then((hardwarePermission) => {
-      return this.requestAuthorizationInternal(types).then((internalPermission => {
-        return Promise.resolve(hardwarePermission && internalPermission);
-      }));
-    });
+    return Promise.all([
+        this.requestHardwarePermissions(),
+        this.requestAuthorizationInternal(types)
+      ]).then((results) => Promise.resolve(results[0] && results[1]));
   }
 
   requestAuthorizationInternal(types: Array<HealthDataType>): Promise<boolean> {
@@ -76,9 +75,8 @@ export class HealthData extends Common implements HealthDataApi {
 
       const fitnessOptions = fitnessOptionsBuilder.build();
 
-      if (GoogleSignIn.hasPermissions(GoogleSignIn.getLastSignedInAccount(application.android.currentContext), fitnessOptions)) {
+      if (GoogleSignIn.hasPermissions(GoogleSignIn.getLastSignedInAccount(getApplicationContext()), fitnessOptions)) {
         resolve(true);
-        return;
       }
 
       const activityResultHandler = (args: application.AndroidActivityResultEventData) => {
@@ -90,7 +88,7 @@ export class HealthData extends Common implements HealthDataApi {
       GoogleSignIn.requestPermissions(
           application.android.foregroundActivity,
           GOOGLE_FIT_PERMISSIONS_REQUEST_CODE,
-          GoogleSignIn.getLastSignedInAccount(application.android.currentContext),
+          GoogleSignIn.getLastSignedInAccount(getApplicationContext()),
           fitnessOptions);
     });
   }
@@ -99,7 +97,7 @@ export class HealthData extends Common implements HealthDataApi {
     return new Promise((resolve, reject) => {
       try {
         // make sure the user is authorized
-        this.requestAuthorization([{name: opts.dataType, accessType: "read"}]).then(authorized => {
+        this.requestAuthorizationInternal([{name: opts.dataType, accessType: "read"}]).then(authorized => {
           if (!authorized) {
             reject("Not authorized");
             return;
@@ -113,7 +111,7 @@ export class HealthData extends Common implements HealthDataApi {
               .setTimeRange(opts.startDate.getTime(), opts.endDate.getTime(), TimeUnit.MILLISECONDS)
               .build();
 
-          Fitness.getHistoryClient(application.android.currentContext, GoogleSignIn.getLastSignedInAccount(application.android.currentContext))
+          Fitness.getHistoryClient(getApplicationContext(), GoogleSignIn.getLastSignedInAccount(getApplicationContext()))
               .readData(readRequest)
               .addOnSuccessListener(new com.google.android.gms.tasks.OnSuccessListener({
                 onSuccess: (dataReadResponse: any /* com.google.android.gms.fitness.result.DataReadResponse */) => {
@@ -232,9 +230,8 @@ export class HealthData extends Common implements HealthDataApi {
   }
 
   private requestHardwarePermissions(): Promise<boolean> {
-     this.requestPermissionFor(this.permissionsNeeded()
+     return this.requestPermissionFor(this.permissionsNeeded()
         .filter(permission => !this.wasPermissionGranted(permission)));
-        return Promise.resolve(this.wasPermissionsGrantedForAll());
   }
 
   private wasPermissionGranted(permission: any) {
@@ -248,15 +245,27 @@ export class HealthData extends Common implements HealthDataApi {
   }
 
   private wasPermissionsGrantedForAll(): boolean {
-      return this.permissionsNeeded().every(permission => this.wasPermissionGranted(permission));
+    return this.permissionsNeeded().every(permission => this.wasPermissionGranted(permission));
   }
 
-  private requestPermissionFor(permissions: any[]) {
-    if (!permissions.length) return;
-    android.support.v4.app.ActivityCompat.requestPermissions(
-      application.android.foregroundActivity,
-      permissions, 234
-    );
+  private requestPermissionFor(permissions: any[]): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+      if (!this.wasPermissionsGrantedForAll()) {
+        const activityRequestPermissionsHandler = (args) => {
+          application.android.off(application.AndroidApplication.activityRequestPermissionsEvent, activityRequestPermissionsHandler);
+          resolve(true);
+        };
+
+        application.android.on(application.AndroidApplication.activityRequestPermissionsEvent, activityRequestPermissionsHandler);
+
+        android.support.v4.app.ActivityCompat.requestPermissions(
+          application.android.foregroundActivity,
+          permissions, 234
+        );
+      } else {
+        resolve(true);
+      }
+    });
   }
 
   private permissionsNeeded(): any[] {

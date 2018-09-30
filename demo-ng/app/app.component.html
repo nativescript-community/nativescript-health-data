@@ -15,6 +15,10 @@
         <Button text="Get Heart Rate (count/min)" (tap)="getData('heartRate', 'count/min')"></Button>
         <Button text="Get Fat percentage (%)" (tap)="getData('fatPercentage', '%')"></Button>
         <Button text="Get Calories (Cal)" (tap)="getData('calories', 'kcal')"></Button>
+        <Button text="Get Sleep" (tap)="getData('sleep')"></Button>
+        <Button text="Get Menstrual" (tap)="getData('menstrual')"></Button>
+        <Button text="Get Ovulation" (tap)="getData('ovulation')"></Button>
+        <Button text="Get Mucus" (tap)="getData('mucus')"></Button>
         <Label horizontalAlignment="center" [text]="resultToShow" textWrap="true"></Label>
     </StackLayout>
 </ScrollView>

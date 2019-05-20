@@ -12,7 +12,7 @@ refer to http://docs.nativescript.org/ui/theme.
 @import 'nativescript-theme-core/css/core.light.css';
 
 Button {
-  margin: 10 0;
+  margin: 6 0;
 }
 
 Label {

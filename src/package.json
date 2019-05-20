@@ -1,6 +1,6 @@
 {
   "name": "nativescript-health-data",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Health Data plugin for Nativescript, using Google Fit and Apple HealthKit.",
   "main": "health-data",
   "typings": "index.d.ts",
@@ -56,9 +56,9 @@
   "homepage": "https://github.com/filipemendes1994/nativescript-health-data",
   "readmeFilename": "README.md",
   "devDependencies": {
-    "tns-core-modules": "~3.4.0",
-    "tns-platform-declarations": "~3.4.0",
-    "typescript": "~2.6.0",
+    "tns-core-modules": "~5.3.2",
+    "tns-platform-declarations": "~5.3.2",
+    "typescript": "~2.8.0",
     "rimraf": "^2.5.0",
     "tslint": "^5.0.0"
   },

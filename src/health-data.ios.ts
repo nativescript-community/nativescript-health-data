@@ -334,9 +334,9 @@ const quantityTypes = {
   dietaryWater: HKQuantityTypeIdentifierDietaryWater,
   dietaryZinc: HKQuantityTypeIdentifierDietaryZinc,
   distanceCycling: HKQuantityTypeIdentifierDistanceCycling,
-  //distanceSwimming: HKQuantityTypeIdentifierDistanceSwimming,
+  // distanceSwimming: HKQuantityTypeIdentifierDistanceSwimming,
   distanceWalkingRunning: HKQuantityTypeIdentifierDistanceWalkingRunning,
-  //distanceWheelChair: HKQuantityTypeIdentifierDistanceWheelchair,
+  // distanceWheelChair: HKQuantityTypeIdentifierDistanceWheelchair,
   electrodermalActivity: HKQuantityTypeIdentifierElectrodermalActivity,
   flightsClimbed: HKQuantityTypeIdentifierFlightsClimbed,
   forcedExpiratoryVolume1: HKQuantityTypeIdentifierForcedExpiratoryVolume1,
@@ -350,10 +350,10 @@ const quantityTypes = {
   oxygenSaturation: HKQuantityTypeIdentifierOxygenSaturation,
   peakExpiratoryFlowRate: HKQuantityTypeIdentifierPeakExpiratoryFlowRate,
   peripheralPerfusionIndex: HKQuantityTypeIdentifierPeripheralPerfusionIndex,
-  //pushCount: HKQuantityTypeIdentifierPushCount,
+  // pushCount: HKQuantityTypeIdentifierPushCount,
   respiratoryRate: HKQuantityTypeIdentifierRespiratoryRate,
   stepCount: HKQuantityTypeIdentifierStepCount,
-  //swimmingStrokeCount: HKQuantityTypeIdentifierSwimmingStrokeCount,
+  // swimmingStrokeCount: HKQuantityTypeIdentifierSwimmingStrokeCount,
   uvExposure: HKQuantityTypeIdentifierUVExposure
 };
 
@@ -366,13 +366,13 @@ if (typeof HKQuantityTypeIdentifierDistanceWheelchair !== 'undefined') {
   Object.assign(quantityTypes, {
     distanceWheelChair: HKQuantityTypeIdentifierDistanceWheelchair
   });
-  //quantityTypes[distanceWheelChair]= HKQuantityTypeIdentifierDistanceWheelchair;
+  // quantityTypes[distanceWheelChair]= HKQuantityTypeIdentifierDistanceWheelchair;
 }
 if (typeof HKQuantityTypeIdentifierPushCount !== 'undefined') {
   Object.assign(quantityTypes, {
     pushCount: HKQuantityTypeIdentifierPushCount
   });
-  //quantityTypes[pushCount]= HKQuantityTypeIdentifierPushCount;
+  // quantityTypes[pushCount]= HKQuantityTypeIdentifierPushCount;
 }
 if (typeof HKQuantityTypeIdentifierSwimmingStrokeCount !== 'undefined') {
   Object.assign(quantityTypes, {
@@ -386,13 +386,13 @@ const characteristicTypes = {
   bloodType: HKCharacteristicTypeIdentifierBloodType,
   dateOfBirthComponents: HKCharacteristicTypeIdentifierDateOfBirth,
   fitzpatrickSkinType: HKCharacteristicTypeIdentifierFitzpatrickSkinType,
-  //wheelchairUse: HKCharacteristicTypeIdentifierWheelchairUse
+  // wheelchairUse: HKCharacteristicTypeIdentifierWheelchairUse
 };
 if (typeof HKCharacteristicTypeIdentifierWheelchairUse !== 'undefined') {
   Object.assign(characteristicTypes, {
     wheelchairUse: HKCharacteristicTypeIdentifierWheelchairUse
   });
-  //characteristicTypes[wheelchairUse]= HKCharacteristicTypeIdentifierWheelchairUse;
+  // characteristicTypes[wheelchairUse]= HKCharacteristicTypeIdentifierWheelchairUse;
 }
 
 const categoryTypes = {
@@ -400,7 +400,7 @@ const categoryTypes = {
   cervicalMucusQuality: HKCategoryTypeIdentifierCervicalMucusQuality,
   intermenstrualBleeding: HKCategoryTypeIdentifierIntermenstrualBleeding,
   menstrualFlow: HKCategoryTypeIdentifierMenstrualFlow,
-  //mindfulSession: HKCategoryTypeIdentifierMindfulSession,
+  // mindfulSession: HKCategoryTypeIdentifierMindfulSession,
   ovulationTestResult: HKCategoryTypeIdentifierOvulationTestResult,
   sexualActivity: HKCategoryTypeIdentifierSexualActivity
   // "sleepAnalysis" : HKCategoryTypeIdentifierSleepAnalysis
@@ -409,7 +409,7 @@ if (typeof HKCategoryTypeIdentifierMindfulSession !== 'undefined') {
   Object.assign(categoryTypes, {
     mindfulSession: HKCategoryTypeIdentifierMindfulSession
   });
-  //categoryTypes[mindfulSession]= HKCategoryTypeIdentifierMindfulSession;
+  // categoryTypes[mindfulSession]= HKCategoryTypeIdentifierMindfulSession;
 }
 
 const acceptableDataTypes = {

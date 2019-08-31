@@ -5,10 +5,14 @@
         "declaration": true,
         "removeComments": true,
         "noLib": false,
+        "skipLibCheck": true,
+        "lib": [
+            "es6",
+            "dom"
+        ],
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
-        "lib": ["es6", "dom"],
-        "sourceMap": true,
+        "sourceMap": false,
         "pretty": true,
         "allowUnreachableCode": false,
         "allowUnusedLabels": false,
@@ -17,9 +21,16 @@
         "noImplicitAny": false,
         "noImplicitReturns": true,
         "noImplicitUseStrict": false,
-        "noFallthroughCasesInSwitch": true
+        "noFallthroughCasesInSwitch": true,
+        "typeRoots": [
+            "./node_modules/@types",
+            "./node_modules"
+        ],
+        "types": [
+        ]
     },
     "exclude": [
+        "demo",
         "node_modules"
     ],
     "compileOnSave": false

@@ -3,11 +3,12 @@ import { alert } from "tns-core-modules/ui/dialogs";
 import { AggregateBy, HealthData, HealthDataType } from "nativescript-health-data";
 
 @Component({
-  selector: "ns-app",
-  templateUrl: "app.component.html"
+  selector: "ItemsComponent",
+  moduleId: module.id,
+  templateUrl: "./items.component.html"
 })
 
-export class AppComponent {
+export class ItemsComponent {
   private static TYPES: Array<HealthDataType> = [
     {name: "height", accessType: "read"},
     {name: "weight", accessType: "readAndWrite"}, // just for show
@@ -33,16 +34,16 @@ export class AppComponent {
     this.healthData.isAuthorized([<HealthDataType>{name: "weight", accessType: "read"}])
         .then(authorized => setTimeout(() => alert({
           title: "Authentication result",
-          message: (authorized ? "" : "Not ") + "authorized for " + JSON.stringify(AppComponent.TYPES),
+          message: (authorized ? "" : "Not ") + "authorized for " + JSON.stringify(ItemsComponent.TYPES),
           okButtonText: "Ok!"
         }), 300));
   }
 
   requestAuthForVariousTypes(): void {
-    this.healthData.requestAuthorization(AppComponent.TYPES)
+    this.healthData.requestAuthorization(ItemsComponent.TYPES)
         .then(authorized => setTimeout(() => alert({
           title: "Authentication result",
-          message: (authorized ? "" : "Not ") + "authorized for " + JSON.stringify(AppComponent.TYPES),
+          message: (authorized ? "" : "Not ") + "authorized for " + JSON.stringify(ItemsComponent.TYPES),
           okButtonText: "Ok!"
         }), 300))
         .catch(error => console.log("Request auth error: ", error));

@@ -2,36 +2,39 @@
   "nativescript": {
     "id": "org.nativescript.plugindemo.healthdata",
     "tns-ios": {
-      "version": "5.3.1"
+      "version": "6.0.2"
     },
     "tns-android": {
-      "version": "5.3.1"
+      "version": "6.0.2"
     }
   },
   "dependencies": {
-    "@angular/animations": "4.4.6",
-    "@angular/common": "4.4.6",
-    "@angular/compiler": "4.4.6",
-    "@angular/core": "4.4.6",
-    "@angular/forms": "4.4.6",
-    "@angular/http": "4.4.6",
-    "@angular/platform-browser": "4.4.6",
-    "@angular/router": "4.4.6",
-    "nativescript-angular": "~4.4.1",
-    "nativescript-health-data": "../src",
-    "nativescript-theme-core": "~1.0.2",
-    "reflect-metadata": "~0.1.8",
-    "rxjs": "~5.5.2",
-    "tns-core-modules": "~5.3.2",
-    "zone.js": "~0.8.2"
+    "@angular/animations": "~8.1.0",
+    "@angular/common": "~8.1.0",
+    "@angular/compiler": "~8.1.0",
+    "@angular/core": "~8.1.0",
+    "@angular/forms": "~8.1.0",
+    "@angular/http": "~8.0.0-beta.10",
+    "@angular/platform-browser": "~8.1.0",
+    "@angular/platform-browser-dynamic": "~8.1.0",
+    "@angular/router": "~8.1.0",
+    "nativescript-angular": "~8.0.3",
+    "nativescript-health-data": "file:../publish/package/nativescript-health-data-1.2.1.tgz",
+    "nativescript-theme-core": "~1.0.6",
+    "reflect-metadata": "~0.1.13",
+    "rxjs": "~6.5.2",
+    "tns-core-modules": "~6.0.0",
+    "zone.js": "~0.10.0"
   },
   "devDependencies": {
-    "babel-traverse": "6.25.0",
-    "babel-types": "6.25.0",
-    "babylon": "6.17.4",
+    "@angular/compiler-cli": "~8.1.0",
+    "@ngtools/webpack": "~8.1.0",
+    "babel-traverse": "6.26.0",
+    "babel-types": "6.26.0",
+    "babylon": "6.18.0",
     "lazy": "1.0.11",
-    "nativescript-dev-typescript": "~0.9.0",
-    "tns-platform-declarations": "~5.3.2",
-    "typescript": "~2.8.0"
+    "tns-platform-declarations": "~6.0.0",
+    "typescript": "3.4.5",
+    "nativescript-dev-webpack": "~1.1.1"
   }
 }

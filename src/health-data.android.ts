@@ -51,7 +51,7 @@ export class HealthData extends Common implements HealthDataApi {
           .forEach(t => fitnessOptionsBuilder.addDataType(this.getDataType(t.name), FitnessOptions.ACCESS_WRITE));
 
       resolve(GoogleSignIn.hasPermissions(
-          GoogleSignIn.getLastSignedInAccount(application.android.currentContext),
+          GoogleSignIn.getLastSignedInAccount((application.android.foregroundActivity || application.android.startActivity)),
           fitnessOptionsBuilder.build()));
     });
   }
@@ -67,7 +67,7 @@ export class HealthData extends Common implements HealthDataApi {
 
       const fitnessOptions = fitnessOptionsBuilder.build();
 
-      if (GoogleSignIn.hasPermissions(GoogleSignIn.getLastSignedInAccount(application.android.currentContext), fitnessOptions)) {
+      if (GoogleSignIn.hasPermissions(GoogleSignIn.getLastSignedInAccount((application.android.foregroundActivity || application.android.startActivity)), fitnessOptions)) {
         resolve(true);
         return;
       }
@@ -81,7 +81,7 @@ export class HealthData extends Common implements HealthDataApi {
       GoogleSignIn.requestPermissions(
           application.android.foregroundActivity,
           GOOGLE_FIT_PERMISSIONS_REQUEST_CODE,
-          GoogleSignIn.getLastSignedInAccount(application.android.currentContext),
+          GoogleSignIn.getLastSignedInAccount((application.android.foregroundActivity || application.android.startActivity)),
           fitnessOptions);
     });
   }
@@ -104,7 +104,7 @@ export class HealthData extends Common implements HealthDataApi {
               .setTimeRange(opts.startDate.getTime(), opts.endDate.getTime(), TimeUnit.MILLISECONDS)
               .build();
 
-          Fitness.getHistoryClient(application.android.currentContext, GoogleSignIn.getLastSignedInAccount(application.android.currentContext))
+          Fitness.getHistoryClient((application.android.foregroundActivity || application.android.startActivity), GoogleSignIn.getLastSignedInAccount((application.android.foregroundActivity || application.android.startActivity)))
               .readData(readRequest)
               .addOnSuccessListener(new com.google.android.gms.tasks.OnSuccessListener({
                 onSuccess: (dataReadResponse: any /* com.google.android.gms.fitness.result.DataReadResponse */) => {

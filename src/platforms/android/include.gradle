@@ -30,6 +30,6 @@ android {
 
 dependencies {
 //	compile 'com.android.support:multidex:1.0.0'
-	compile 'com.google.android.gms:play-services-fitness:11.6.0'
-    compile 'com.google.android.gms:play-services-auth:11.6.0'
+	compile 'com.google.android.gms:play-services-fitness:16.0.1'
+    compile 'com.google.android.gms:play-services-auth:16.0.1'
 }

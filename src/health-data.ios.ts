@@ -181,6 +181,9 @@ export class HealthData extends Common implements HealthDataApi {
               };
 
               // TODO other types, see https://github.com/Telerik-Verified-Plugins/HealthKit/blob/c6b15ea8096bae3e61dc71a3cb0098da44f411fd/src/ios/HealthKit.m#L1333
+              if (sample instanceof HKCategorySample) {
+                resultItem.value = sample.value;
+              }
               if (sample instanceof HKQuantitySample) {
                 if ((<HKQuantitySample>sample).quantity.isCompatibleWithUnit(unit)) {
                   resultItem.value = (<HKQuantitySample>sample).quantity.doubleValueForUnit(unit);
@@ -402,8 +405,8 @@ const categoryTypes = {
   menstrualFlow: HKCategoryTypeIdentifierMenstrualFlow,
   // mindfulSession: HKCategoryTypeIdentifierMindfulSession,
   ovulationTestResult: HKCategoryTypeIdentifierOvulationTestResult,
+  sleepAnalysis : HKCategoryTypeIdentifierSleepAnalysis,
   sexualActivity: HKCategoryTypeIdentifierSexualActivity
-  // "sleepAnalysis" : HKCategoryTypeIdentifierSleepAnalysis
 };
 if (typeof HKCategoryTypeIdentifierMindfulSession !== 'undefined') {
   Object.assign(categoryTypes, {
@@ -414,6 +417,10 @@ if (typeof HKCategoryTypeIdentifierMindfulSession !== 'undefined') {
 
 const acceptableDataTypes = {
   steps: 'stepCount',
+  sleep: 'sleepAnalysis',
+  menstrual: 'menstrualFlow',
+  ovulation: 'ovulationTestResult',
+  mucus: 'cervicalMucusQuality',
   distance: /*"distanceCycling",*/ 'distanceWalkingRunning',
   calories: 'activeEnergyBurned' /*"basalEnergyBurned"*/,
   // "activity" : "",

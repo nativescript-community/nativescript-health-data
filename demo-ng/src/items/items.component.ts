@@ -49,14 +49,14 @@ export class ItemsComponent {
         .catch(error => console.log("Request auth error: ", error));
   }
 
-  getData(dataType: string, unit: string, aggregateBy?: AggregateBy): Promise<void> {
+  getData(dataType: string, unit?: string, aggregateBy?: AggregateBy): Promise<void> {
     return this.healthData.query(
         {
           startDate: new Date(new Date().getTime() - 24 * 60 * 60 * 1000), // 1 day ago
           endDate: new Date(), // now
-          dataType: dataType,
-          unit: unit,
-          aggregateBy: aggregateBy,
+          dataType,
+          unit,
+          aggregateBy,
           sortOrder: "desc"
         })
         .then(result => {

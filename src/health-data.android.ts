@@ -14,7 +14,14 @@ import getApplicationContext = ad.getApplicationContext;
 
 const GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 2;
 
-declare const com: any;
+declare const android, com, global: any;
+
+const AppPackageName = useAndroidX() ? global.androidx.core.app : android.support.v4.app;
+const ContentPackageName = useAndroidX() ? global.androidx.core.content : android.support.v4.content;
+
+function useAndroidX () {
+  return global.androidx && global.androidx.appcompat;
+}
 
 // android imports
 const DataReadRequest = com.google.android.gms.fitness.request.DataReadRequest;
@@ -57,7 +64,13 @@ export class HealthData extends Common implements HealthDataApi {
   }
 
   requestAuthorization(types: Array<HealthDataType>): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
+    return Promise.all([
+      this.requestHardwarePermissions(),
+      this.requestAuthorizationInternal(types)
+    ]).then(results => Promise.resolve(results[0] && results[1]));
+  }
+
+  requestAuthorizationInternal(types: Array<HealthDataType>): Promise<boolean> {    return new Promise<boolean>((resolve, reject) => {
       const fitnessOptionsBuilder = FitnessOptions.builder();
 
       types.filter(t => t.accessType === "read" || t.accessType === "readAndWrite")
@@ -90,7 +103,7 @@ export class HealthData extends Common implements HealthDataApi {
     return new Promise((resolve, reject) => {
       try {
         // make sure the user is authorized
-        this.requestAuthorization([{name: opts.dataType, accessType: "read"}]).then(authorized => {
+        this.requestAuthorizationInternal([{name: opts.dataType, accessType: "read"}]).then(authorized => {
           if (!authorized) {
             reject("Not authorized");
             return;
@@ -220,6 +233,60 @@ export class HealthData extends Common implements HealthDataApi {
     // TODO check if the passed type is ok
     const typeOfData = acceptableDataTypesForCommonity[pluginType];
     return aggregatedDataTypes[typeOfData];
+  }
+
+  private requestHardwarePermissions(): Promise<boolean> {
+    return this.requestPermissionFor(this.permissionsNeeded()
+        .filter(permission => !this.wasPermissionGranted(permission)));
+  }
+
+  private wasPermissionGranted(permission: any) {
+    let hasPermission = android.os.Build.VERSION.SDK_INT < 23; // Android M. (6.0)
+    if (!hasPermission) {
+      hasPermission = android.content.pm.PackageManager.PERMISSION_GRANTED ===
+          ContentPackageName.ContextCompat.checkSelfPermission(
+              utils.ad.getApplicationContext(),
+              permission);
+    }
+    return hasPermission;
+  }
+
+  private wasPermissionsGrantedForAll(): boolean {
+    return this.permissionsNeeded().every(permission => this.wasPermissionGranted(permission));
+  }
+
+  private requestPermissionFor(permissions: any[]): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+      if (!this.wasPermissionsGrantedForAll()) {
+        const activityRequestPermissionsHandler = args => {
+          application.android.off(application.AndroidApplication.activityRequestPermissionsEvent, activityRequestPermissionsHandler);
+          resolve(true);
+        };
+
+        application.android.on(application.AndroidApplication.activityRequestPermissionsEvent, activityRequestPermissionsHandler);
+
+        AppPackageName.ActivityCompat.requestPermissions(
+            application.android.foregroundActivity,
+            permissions,
+            235 // irrelevant since we simply invoke onPermissionGranted
+        );
+      } else {
+        resolve(true);
+      }
+    });
+  }
+
+  private permissionsNeeded(): any[] {
+    const permissions = [
+      android.Manifest.permission.ACCESS_FINE_LOCATION,
+      android.Manifest.permission.ACCESS_NETWORK_STATE,
+      android.Manifest.permission.GET_ACCOUNTS];
+
+    if (android.os.Build.VERSION.SDK_INT > 19) {
+      permissions.push(android.Manifest.permission.BODY_SENSORS);
+    }
+
+    return permissions;
   }
 }
 

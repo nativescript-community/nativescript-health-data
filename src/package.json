@@ -20,8 +20,8 @@
     "demo.ios": "npm i && npm run tsc && cd ../demo && tns run ios",
     "demo.android": "npm i && npm run tsc && cd ../demo && tns run android",
     "clean": "rm -rf node_modules && cd ../demo && rm -rf hooks node_modules platforms && cd ../src && npm run plugin.link",
-    "demo.ng.ios": "npm i && npm run tsc && npm run package && cd ../demo-ng && tns run ios",
-    "demo.ng.android": "npm i && npm run tsc && npm run package && cd ../demo-ng && tns run android",
+    "demo.ng.ios": "npm i && npm run tsc && npm run package && cd ../demo-ng && tns plugin remove nativescript-health-data && tns plugin add ../publish/package/*.tgz && tns run ios",
+    "demo.ng.android": "npm i && npm run tsc && npm run package && cd ../demo-ng && tns plugin remove nativescript-health-data && tns plugin add ../publish/package/*.tgz && tns run android",
     "plugin.ng.link": "npm link && cd ../demo-ng && npm link nativescript-health-data && cd ../src",
     "package": "cd ../publish && ./pack.sh",
     "setup": "npm i && npm run tsc && cd ../demo-ng && npm i"

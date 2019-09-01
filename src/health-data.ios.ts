@@ -162,7 +162,7 @@ export class HealthData extends Common implements HealthDataApi {
     const sortBy = NSArray.arrayWithObject<NSSortDescriptor>(endDateSortDescriptor);
 
     // note that passing an invalid 'unitString' will crash the app (can't catch that error either)
-    const unit = HKUnit.unitFromString(opts.unit);
+    const unit = opts.unit ? HKUnit.unitFromString(opts.unit) : undefined;
 
     let query = HKSampleQuery.alloc().initWithSampleTypePredicateLimitSortDescriptorsResultsHandler(
         objectType, predicate, null, sortBy, (query: HKSampleQuery, listResults: NSArray<HKSample>, error: NSError) => {
@@ -183,8 +183,7 @@ export class HealthData extends Common implements HealthDataApi {
               // TODO other types, see https://github.com/Telerik-Verified-Plugins/HealthKit/blob/c6b15ea8096bae3e61dc71a3cb0098da44f411fd/src/ios/HealthKit.m#L1333
               if (sample instanceof HKCategorySample) {
                 resultItem.value = sample.value;
-              }
-              if (sample instanceof HKQuantitySample) {
+              } else if (sample instanceof HKQuantitySample) {
                 if ((<HKQuantitySample>sample).quantity.isCompatibleWithUnit(unit)) {
                   resultItem.value = (<HKQuantitySample>sample).quantity.doubleValueForUnit(unit);
                 } else {

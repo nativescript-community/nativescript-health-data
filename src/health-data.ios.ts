@@ -426,6 +426,7 @@ const acceptableDataTypes = {
   height: 'height',
   weight: 'bodyMass',
   heartRate: 'heartRate',
-  fatPercentage: 'bodyFatPercentage'
+  fatPercentage: 'bodyFatPercentage',
+  cardio: 'appleExerciseTime'
   // "nutrition" : ""
 };

@@ -179,6 +179,7 @@ The reason is I intend to support more units per type, but that is yet to be imp
 | weight | kg | `TYPE_WEIGHT` | `HKQuantityTypeIdentifierBodyMass` |
 | heartRate | count/min | `TYPE_HEART_RATE_BPM` | `HKQuantityTypeIdentifierHeartRate` |
 | fatPercentage | % | `TYPE_BODY_FAT_PERCENTAGE` | `HKQuantityTypeIdentifierBodyFatPercentage` |
+| cardio | min | `TYPE_HEART_POINTS` | `HKQuantityTypeIdentifierAppleExerciseTime` |
 
 ## Credits
 * [Filipe Mendes](https://github.com/filipemendes1994/) for a superb first version of this repo, while working for SPMS, Shared Services for Ministry of Health (of Portugal). He kindly transferred this repo to me when he no longer had time to maintain it.

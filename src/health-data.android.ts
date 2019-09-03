@@ -299,7 +299,8 @@ const aggregatedDataTypes = {
   TYPE_WEIGHT: DataType.TYPE_WEIGHT,
   TYPE_HEART_RATE_BPM: DataType.AGGREGATE_HEART_RATE_SUMMARY,
   TYPE_BODY_FAT_PERCENTAGE: DataType.AGGREGATE_BODY_FAT_PERCENTAGE_SUMMARY,
-  TYPE_NUTRITION: DataType.AGGREGATE_NUTRITION_SUMMARY
+  TYPE_NUTRITION: DataType.AGGREGATE_NUTRITION_SUMMARY,
+  TYPE_HEART_POINTS: DataType.TYPE_HEART_POINTS
 };
 
 const acceptableDataTypesForCommonity = {
@@ -310,6 +311,7 @@ const acceptableDataTypesForCommonity = {
   height: 'TYPE_HEIGHT',
   weight: 'TYPE_WEIGHT',
   heartRate: 'TYPE_HEART_RATE_BPM',
-  fatPercentage: 'TYPE_BODY_FAT_PERCENTAGE'
+  fatPercentage: 'TYPE_BODY_FAT_PERCENTAGE',
+  cardio: 'TYPE_HEART_POINTS'
   // "nutrition": "TYPE_NUTRITION",
 };

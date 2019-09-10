@@ -97,6 +97,33 @@ export class HealthData extends Common implements HealthDataApi {
     });
   }
 
+  queryAggregateData(opts: QueryRequest): Promise<Array<ResponseItem>> {
+    return new Promise((resolve, reject) => {
+      // make sure the user is authorized
+      this.requestAuthorization([{name: opts.dataType, accessType: "read"}]).then(authorized => {
+        if (!authorized) {
+          reject("Not authorized");
+          return;
+        }
+
+        let typeOfData = acceptableDataTypes[opts.dataType];
+        if (quantityTypes[typeOfData] || categoryTypes[typeOfData]) {
+          this.queryForStatisticsCollectionData(typeOfData, opts, (res, error) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(res);
+            }
+          });
+          // } else if (characteristicTypes[typeOfData]) {
+          //   resolve(this.queryForCharacteristicData(typeOfData));
+        } else {
+          reject('Type not supported (yet)');
+        }
+      });
+    });
+  }
+
   startMonitoring(opts: StartMonitoringRequest): Promise<void> {
     return new Promise((resolve, reject) => {
       // make sure the user is authorized
@@ -153,6 +180,15 @@ export class HealthData extends Common implements HealthDataApi {
     }
   }
 
+  private resolveQuantityType(type: string): HKQuantityType {
+    if (quantityTypes[type]) {
+      return HKQuantityType.quantityTypeForIdentifier(quantityTypes[type]);
+    } else {
+      console.log("Constant not supported: " + type);
+      return null;
+    }
+  }
+
   private queryForQuantityOrCategoryData(dataType: string, opts: QueryRequest, callback: (data: Array<ResponseItem>, error: string) => void) {
     const objectType = this.resolveDataType(dataType);
 
@@ -203,6 +239,45 @@ export class HealthData extends Common implements HealthDataApi {
     );
     this.healthStore.executeQuery(query);
   }
+
+  private queryForStatisticsCollectionData(dataType: string, opts: QueryRequest, callback: (data: Array<ResponseItem>, error: string) => void) {
+    const objectType = this.resolveQuantityType(dataType);
+    // note that passing an invalid 'unitString' will crash the app (can't catch that error either)
+    const unit = opts.unit ? HKUnit.unitFromString(opts.unit) : undefined;
+    const aggregate = NSDateComponents.alloc().init();
+
+    switch (opts.aggregateBy) {
+      case("hour"):
+          aggregate.hour = 1;
+          aggregate.nanosecond = 100;
+          break;
+      case("day"):
+          aggregate.day = 1;
+          aggregate.nanosecond = 100;
+          break;
+    }
+
+    var query = HKStatisticsCollectionQuery.alloc().initWithQuantityTypeQuantitySamplePredicateOptionsAnchorDateIntervalComponents(objectType, null, 16, opts.startDate, aggregate)
+    query.initialResultsHandler = function (query: HKStatisticsCollectionQuery, listResults: HKStatisticsCollection, error: NSError) { 
+      let statsCollection = listResults;
+      const parsedData: Array<ResponseItem> = [];
+      statsCollection.enumerateStatisticsFromDateToDateWithBlock(opts.startDate, opts.endDate, function (statistics,stop) {
+          if (statistics.sumQuantity()) {
+              var startDate = statistics.startDate;
+              var endDate = statistics.endDate;
+              const resultItem = <ResponseItem>{
+                  unit: opts.unit,
+                  start: startDate,
+                  end: endDate
+              };
+              resultItem.value = Math.floor(statistics.sumQuantity().doubleValueForUnit(unit));
+              parsedData.push(resultItem);
+          }
+      })
+      callback(parsedData, null);
+    }
+    this.healthStore.executeQuery(query);
+  };
 
   private monitorData(dataType: string, opts: StartMonitoringRequest): void {
     const objectType = this.resolveDataType(dataType);
@@ -426,6 +501,7 @@ const acceptableDataTypes = {
   height: 'height',
   weight: 'bodyMass',
   heartRate: 'heartRate',
-  fatPercentage: 'bodyFatPercentage'
+  fatPercentage: 'bodyFatPercentage',
+  cardio: 'appleExerciseTime'
   // "nutrition" : ""
 };

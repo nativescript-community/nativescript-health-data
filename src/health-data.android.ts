@@ -25,6 +25,7 @@ function useAndroidX () {
 
 // android imports
 const DataReadRequest = com.google.android.gms.fitness.request.DataReadRequest;
+const DataSource = com.google.android.gms.fitness.data.DataSource;
 const DataType = com.google.android.gms.fitness.data.DataType;
 const Fitness = com.google.android.gms.fitness.Fitness;
 const GoogleApiAvailability = com.google.android.gms.common.GoogleApiAvailability;
@@ -142,6 +143,66 @@ export class HealthData extends Common implements HealthDataApi {
     });
   }
 
+  queryAggregateData(opts: QueryRequest): Promise<Array<ResponseItem>> {
+    return new Promise((resolve, reject) => {
+      try {
+        // make sure the user is authorized
+        this.requestAuthorizationInternal([{name: opts.dataType, accessType: "read"}]).then(authorized => {
+          if (!authorized) {
+            reject("Not authorized");
+            return;
+          }
+
+          switch (opts.aggregateBy) {
+            case("hour"):
+                var _aggregateBy = TimeUnit.HOURS
+                break;
+            case("day"):
+                var _aggregateBy = TimeUnit.DAYS
+                break;
+            default:
+                var _aggregateBy = TimeUnit.DAYS
+          }
+
+          const myDataSource = new DataSource.Builder()
+              .setDataType(this.getDataType(opts.dataType))
+              .setType(DataSource.TYPE_DERIVED)
+              .setStreamName(this.getStreamName(opts.dataType))
+              .setAppPackageName("com.google.android.gms")
+              .build();
+
+          const readRequest = new DataReadRequest.Builder()
+              .aggregate(myDataSource, this.getAggregatedDataType(opts.dataType))
+              .setTimeRange(opts.startDate.getTime(), opts.endDate.getTime(), TimeUnit.MILLISECONDS)
+              .bucketByTime(1, _aggregateBy)
+              .enableServerQueries()
+              .build();
+        
+          Fitness.getHistoryClient((application.android.foregroundActivity || application.android.startActivity), GoogleSignIn.getLastSignedInAccount((application.android.foregroundActivity || application.android.startActivity)))
+              .readData(readRequest)
+              .addOnSuccessListener(new com.google.android.gms.tasks.OnSuccessListener({
+                onSuccess: (dataReadResponse: any /* com.google.android.gms.fitness.result.DataReadResponse */) => {
+                  resolve(this.parseData(dataReadResponse.getResult(), opts));
+                }
+              }))
+              .addOnFailureListener(new com.google.android.gms.tasks.OnFailureListener({
+                onFailure: (exception: any) => {
+                  reject(exception.getMessage());
+                }
+              }))
+              .addOnCompleteListener(new com.google.android.gms.tasks.OnCompleteListener({
+                onComplete: (task: any) => {
+                  // noop
+                }
+              }));
+        });
+      } 
+      catch (e) {
+        reject(e);
+      }
+    });
+  }
+
   startMonitoring(opts: StartMonitoringRequest): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       reject("Not supported");
@@ -229,10 +290,22 @@ export class HealthData extends Common implements HealthDataApi {
     return this.aggregate(parsedData, opts.aggregateBy);
   }
 
-  private getDataType(pluginType: string): any /*com.google.android.gms.fitness.data.DataType */ {
+  private getAggregatedDataType(pluginType: string): any /*com.google.android.gms.fitness.data.DataType */ {
     // TODO check if the passed type is ok
     const typeOfData = acceptableDataTypesForCommonity[pluginType];
     return aggregatedDataTypes[typeOfData];
+  }
+
+  private getDataType(pluginType: string): any /*com.google.android.gms.fitness.data.DataType */ {
+    // TODO check if the passed type is ok
+    const typeOfData = acceptableDataTypesForCommonity[pluginType];
+    return dataTypes[typeOfData];
+  }
+
+  private getStreamName(pluginType: string): any /*com.google.android.gms.fitness.data.DataType */ {
+    // TODO check if the passed type is ok
+    const typeOfData = acceptableDataTypesForCommonity[pluginType];
+    return streamNames[typeOfData];
   }
 
   private requestHardwarePermissions(): Promise<boolean> {
@@ -299,7 +372,25 @@ const aggregatedDataTypes = {
   TYPE_WEIGHT: DataType.TYPE_WEIGHT,
   TYPE_HEART_RATE_BPM: DataType.AGGREGATE_HEART_RATE_SUMMARY,
   TYPE_BODY_FAT_PERCENTAGE: DataType.AGGREGATE_BODY_FAT_PERCENTAGE_SUMMARY,
-  TYPE_NUTRITION: DataType.AGGREGATE_NUTRITION_SUMMARY
+  TYPE_NUTRITION: DataType.AGGREGATE_NUTRITION_SUMMARY,
+  TYPE_HEART_POINTS: DataType.TYPE_HEART_POINTS
+};
+
+const dataTypes = {
+  TYPE_STEP_COUNT_DELTA: DataType.TYPE_STEP_COUNT_DELTA,
+  TYPE_DISTANCE_DELTA: DataType.TYPE_DISTANCE_DELTA,
+  TYPE_CALORIES_EXPENDED: DataType.TYPE_CALORIES_EXPENDED,
+  TYPE_HEIGHT: DataType.TYPE_HEIGHT,
+  TYPE_WEIGHT: DataType.TYPE_WEIGHT,
+  TYPE_HEART_RATE_BPM: DataType.TYPE_HEART_RATE_BPM,
+  TYPE_BODY_FAT_PERCENTAGE: DataType.TYPE_BODY_FAT_PERCENTAGE,
+  TYPE_NUTRITION: DataType.TYPE_NUTRITION,
+  TYPE_HEART_POINTS: DataType.TYPE_HEART_POINTS
+};
+const streamNames = {
+  TYPE_STEP_COUNT_DELTA: "estimated_steps",
+  TYPE_DISTANCE_DELTA: "merge_distance_delta",
+  TYPE_CALORIES_EXPENDED: "merge_calories_expended"
 };
 
 const acceptableDataTypesForCommonity = {
@@ -310,6 +401,7 @@ const acceptableDataTypesForCommonity = {
   height: 'TYPE_HEIGHT',
   weight: 'TYPE_WEIGHT',
   heartRate: 'TYPE_HEART_RATE_BPM',
-  fatPercentage: 'TYPE_BODY_FAT_PERCENTAGE'
+  fatPercentage: 'TYPE_BODY_FAT_PERCENTAGE',
+  cardio: 'TYPE_HEART_POINTS'
   // "nutrition": "TYPE_NUTRITION",
 };

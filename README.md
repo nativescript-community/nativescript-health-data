@@ -124,6 +124,33 @@ this.healthData.query(
     .catch(error => this.resultToShow = error);
 ```
 
+### `queryAggregateData`
+
+Difference between `query` and `queryAggregateData`: if you use `query`, you will probably find that the number of steps (or other types of data) do not match those shown by the Google Fit and Apple Health apps.  If you wanted to accurately compute the user's data then use: `queryAggregateData`
+
+Mandatory properties are `startData`, `endDate`, and `dataType`.
+The `dataType` must be one of the ['Available Data Types'](#available-data-types).
+
+By default data is aggregated by `day`.
+This plugin however offers a way to aggregate the data by either `hour` and `day`. (`month` and `year` available soon)
+
+Note that `queryAggregateData` only supports `steps`, `calories` and `distance` on Android. (More data types available soon).
+ 
+If you didn't run `requestAuthorization` before running `query`,
+the plugin will run `requestAuthorization` for you (for the requested `dataType`). You're welcome. 😉 
+
+```typescript
+this.healthData.queryAggregateData(
+    {
+      startDate: new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+      endDate: new Date(), // now
+      dataType: "steps", // equal to the 'name' property of 'HealthDataType'
+      unit: "count", // make sure this is compatible with the 'dataType' (see below)
+      aggregateBy: "day", // optional, one of: "hour", "day" ; default: "day"
+    })
+    .then(result => console.log(JSON.stringify(result)))
+    .catch(error => this.resultToShow = error);
+```
 
 ### `startMonitoring` (iOS only, for now)
 If you want to be notified when health data was changed, you can monitor specific types.

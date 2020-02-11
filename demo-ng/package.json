@@ -2,10 +2,10 @@
   "nativescript": {
     "id": "org.nativescript.plugindemo.healthdata",
     "tns-ios": {
-      "version": "6.0.2"
+      "version": "6.1.1"
     },
     "tns-android": {
-      "version": "6.0.2"
+      "version": "6.1.1"
     }
   },
   "dependencies": {
@@ -23,7 +23,7 @@
     "nativescript-theme-core": "~1.0.6",
     "reflect-metadata": "~0.1.13",
     "rxjs": "~6.5.2",
-    "tns-core-modules": "~6.0.0",
+    "tns-core-modules": "~6.1.0",
     "zone.js": "~0.10.0"
   },
   "devDependencies": {
@@ -33,7 +33,7 @@
     "babel-types": "6.26.0",
     "babylon": "6.18.0",
     "lazy": "1.0.11",
-    "tns-platform-declarations": "~6.0.0",
+    "tns-platform-declarations": "~6.1.0",
     "typescript": "3.4.5",
     "nativescript-dev-webpack": "~1.1.1"
   }

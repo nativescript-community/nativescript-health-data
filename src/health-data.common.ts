@@ -1,69 +1,69 @@
 export interface ConfigurationData {
-  startDate: Date;
-  endDate: Date;
-  gfBucketUnit: string;
-  gfBucketSize: number;
-  typeOfData: string;
+	startDate: Date;
+	endDate: Date;
+	gfBucketUnit: string;
+	gfBucketSize: number;
+	typeOfData: string;
 }
 
 export interface HealthDataType {
-  name: string;
-  accessType: "read" | "write" | "readAndWrite";
+	name: string;
+	accessType: 'read' | 'write' | 'readAndWrite';
 }
 
-export type AggregateBy = "hour" | "day" | "sourceAndDay";
+export type AggregateBy = 'hour' | 'day' | 'sourceAndDay';
 
-export type BackgroundUpdateFrequency = "immediate" | "hourly" | "daily" | "weekly";
+export type BackgroundUpdateFrequency = 'immediate' | 'hourly' | 'daily' | 'weekly';
 
-export type SortOrder = "asc" | "desc";
+export type SortOrder = 'asc' | 'desc';
 
 export interface QueryRequest {
-  startDate: Date;
-  endDate: Date;
-  dataType: string;
-  unit: string;
-  aggregateBy?: AggregateBy;
-  /**
-   * Default "asc"
-   */
-  sortOrder?: SortOrder;
-  /**
-   * Default undefined, so whatever the platform limit is.
-   */
-  limit?: number;
+	startDate: Date;
+	endDate: Date;
+	dataType: string;
+	unit: string;
+	aggregateBy?: AggregateBy;
+	/**
+	 * Default "asc"
+	 */
+	sortOrder?: SortOrder;
+	/**
+	 * Default undefined, so whatever the platform limit is.
+	 */
+	limit?: number;
 }
 
 export interface StartMonitoringRequest {
-  /**
-   * Default false
-   */
-  enableBackgroundUpdates?: boolean;
-  /**
-   * Default 'immediate', only relevant when 'enableBackgroundUpdates' is 'true'.
-   */
-  backgroundUpdateFrequency?: BackgroundUpdateFrequency;
-  dataType: string;
-  /**
-   * This callback function is invoked when the health store receives an update (add/delete data).
-   * You can use this trigger to fetch the latest data.
-   */
-  onUpdate: (completionHandler: () => void) => void;
-  onError?: (error: string) => void;
+	/**
+	 * Default false
+	 */
+	enableBackgroundUpdates?: boolean;
+	/**
+	 * Default 'immediate', only relevant when 'enableBackgroundUpdates' is 'true'.
+	 */
+	backgroundUpdateFrequency?: BackgroundUpdateFrequency;
+	dataType: string;
+	/**
+	 * This callback function is invoked when the health store receives an update (add/delete data).
+	 * You can use this trigger to fetch the latest data.
+	 */
+	onUpdate: (completionHandler: () => void) => void;
+	onError?: (error: string) => void;
 }
 
 export interface StopMonitoringRequest {
-  dataType?: string;
+	dataType?: string;
 }
 
 export interface ResponseItem {
-  start: Date;
-  end: Date;
-  value: number;
-  /**
-   * Added this, because on Android this may be different than what was requested
-   */
-  unit: string;
-  source?: string;
+	start: Date;
+	end: Date;
+	value: number;
+	/**
+	 * Added this, because on Android this may be different than what was requested
+	 */
+	unit: string;
+	source?: string;
 }
 
 /*
@@ -99,65 +99,71 @@ export function createErrorResponse(action: string, description: string): ErrorR
 */
 
 export interface HealthDataApi {
-  isAvailable(updateGooglePlayServicesIfNeeded? /* for Android, default true */: boolean): Promise<boolean>;
+	isAvailable(updateGooglePlayServicesIfNeeded?: /* for Android, default true */ boolean): Promise<boolean>;
 
-  isAuthorized(types: Array<HealthDataType>): Promise<boolean>;
+	isAuthorized(types: Array<HealthDataType>): Promise<boolean>;
 
-  requestAuthorization(types: Array<HealthDataType>): Promise<boolean>;
+	requestAuthorization(types: Array<HealthDataType>): Promise<boolean>;
 
-  query(opts: QueryRequest): Promise<Array<ResponseItem>>;
+	query(opts: QueryRequest): Promise<Array<ResponseItem>>;
 
-  startMonitoring(opts: StartMonitoringRequest): Promise<void>;
+	startMonitoring(opts: StartMonitoringRequest): Promise<void>;
 
-  stopMonitoring(opts: StopMonitoringRequest): Promise<void>;
+	stopMonitoring(opts: StopMonitoringRequest): Promise<void>;
 }
 
 export abstract class Common {
-  protected aggregate(parsedData: Array<ResponseItem>, aggregateBy?: AggregateBy): Array<ResponseItem> {
-    if (aggregateBy) {
-      let result: Array<ResponseItem> = [];
-      if (aggregateBy === "sourceAndDay") {
-        // extract the unique sources
-        const distinctSources: Set<string> = new Set();
-        parsedData.forEach(item => distinctSources.add(item.source));
-        // for each source, filter and aggregate the data
-        distinctSources.forEach(source => this.aggregateData(parsedData.filter(item => item.source === source), aggregateBy, result));
-      } else {
-        this.aggregateData(parsedData, aggregateBy, result);
-      }
-      return result;
-    } else {
-      return parsedData;
-    }
-  }
+	protected aggregate(parsedData: Array<ResponseItem>, aggregateBy?: AggregateBy): Array<ResponseItem> {
+		if (aggregateBy) {
+			let result: Array<ResponseItem> = [];
+			if (aggregateBy === 'sourceAndDay') {
+				// extract the unique sources
+				const distinctSources: Set<string> = new Set();
+				parsedData.forEach((item) => distinctSources.add(item.source));
+				// for each source, filter and aggregate the data
+				distinctSources.forEach((source) =>
+					this.aggregateData(
+						parsedData.filter((item) => item.source === source),
+						aggregateBy,
+						result
+					)
+				);
+			} else {
+				this.aggregateData(parsedData, aggregateBy, result);
+			}
+			return result;
+		} else {
+			return parsedData;
+		}
+	}
 
-  private aggregateData(parsedData: Array<ResponseItem>, aggregateBy: AggregateBy, result: Array<ResponseItem>): void {
-    parsedData.forEach((item, i) => {
-      const previousItem = i === 0 ? null : parsedData[i - 1];
-      if (previousItem === null || !this.isSameAggregationInterval(item, previousItem, aggregateBy)) {
-        result.push(<ResponseItem>{
-          source: item.source,
-          start: item.start,
-          end: item.end,
-          value: item.value
-        });
-      } else {
-        result[result.length - 1].value += item.value;
-        result[result.length - 1].end = item.end;
-      }
-    });
-  }
+	private aggregateData(parsedData: Array<ResponseItem>, aggregateBy: AggregateBy, result: Array<ResponseItem>): void {
+		parsedData.forEach((item, i) => {
+			const previousItem = i === 0 ? null : parsedData[i - 1];
+			if (previousItem === null || !this.isSameAggregationInterval(item, previousItem, aggregateBy)) {
+				result.push(<ResponseItem>{
+					source: item.source,
+					start: item.start,
+					end: item.end,
+					value: item.value,
+				});
+			} else {
+				result[result.length - 1].value += item.value;
+				result[result.length - 1].end = item.end;
+			}
+		});
+	}
 
-  // note that the startdate determines the interval
-  private isSameAggregationInterval(item: ResponseItem, previousItem: ResponseItem, aggregateBy: AggregateBy) {
-    const isSameDay = item.start.toDateString() === previousItem.start.toDateString();
-    if (aggregateBy === "hour") {
-      return isSameDay && item.start.getHours() === previousItem.start.getHours();
-    } else if (aggregateBy === "day" || "sourceAndDay") {
-      // note that when this function is called, the sources have already been dealt with, so treat it equal to "day"
-      return isSameDay;
-    } else {
-      return false;
-    }
-  }
+	// note that the startdate determines the interval
+	private isSameAggregationInterval(item: ResponseItem, previousItem: ResponseItem, aggregateBy: AggregateBy) {
+		const isSameDay = item.start.toDateString() === previousItem.start.toDateString();
+		if (aggregateBy === 'hour') {
+			return isSameDay && item.start.getHours() === previousItem.start.getHours();
+		} else if (aggregateBy === 'day' || 'sourceAndDay') {
+			// note that when this function is called, the sources have already been dealt with, so treat it equal to "day"
+			return isSameDay;
+		} else {
+			return false;
+		}
+	}
 }

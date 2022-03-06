@@ -1,0 +1,56 @@
+{
+  "name": "nativescript-health-data",
+  "version": "1.3.0",
+  "description": "Health Data plugin for Nativescript, using Google Fit and Apple HealthKit.",
+    "main": "./index",
+    "sideEffects": false,
+    "typings": "./index.d.ts",
+    "scripts": {
+        "build": "npm run tsc && npm run readme",
+        "build.all": "npm run build && npm run build.angular",
+        "build.angular": "../../node_modules/.bin/ng-packagr -p ../../src/health-data/angular/ng-package.json -c ../../src/health-data/angular/tsconfig.json",
+        "readme": "../../node_modules/.bin/readme generate -c ../../tools/readme/blueprint.json",
+        "tsc": "../../node_modules/.bin/cpy '**/*.d.ts' '../../packages/health-data' --parents --cwd=../../src/health-data && ../../node_modules/.bin/tsc -skipLibCheck -d",
+        "clean": "../../node_modules/.bin/rimraf ./*.d.ts ./*.js ./*.js.map"
+    },
+    "nativescript": {
+        "platforms": {
+            "android": "6.0.0",
+            "ios": "6.0.0"
+        }
+    },
+    "keywords": [
+      "NativeScript",
+      "JavaScript",
+      "Android",
+      "iOS",
+      "Health",
+      "HealthKit",
+      "Google Fit"
+    ],
+    "author": {
+      "name": "Eddy Verbruggen",
+      "email": "eddyverbruggen@gmail.com"
+    },
+    "contributors": [
+      {
+        "name": "Filipe Mendes",
+        "email": "filipemendes1994@gmail.com"
+      },
+      {
+        "name": "Daniel Leal",
+        "url": "https://github.com/danielgek"
+      }
+    ],
+    "bugs": {
+        "url": "https://github.com/nativescript-community/health-data/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/nativescript-community/health-data"
+    },
+    "license": "Apache-2.0",
+    "readmeFilename": "README.md",
+    "dependencies": {
+    }
+}

@@ -1,0 +1,16 @@
+allprojects {
+    repositories {
+	    mavenCentral()
+        maven {
+            url "https://maven.google.com"
+        }
+    }
+}
+
+dependencies {
+	def androidGMSFitness =  project.hasProperty("androidGMSFitness") ? project.androidGMSFitness : "16.0.1"
+	def androidGMSAuth =  project.hasProperty("androidGMSAuth") ? project.androidGMSAuth : "16.0.1"
+
+	implementation "com.google.android.gms:play-services-fitness:$androidGMSFitness"
+    implementation "com.google.android.gms:play-services-auth:$androidGMSAuth"
+}

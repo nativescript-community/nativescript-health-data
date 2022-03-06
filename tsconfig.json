@@ -1,0 +1,9 @@
+{
+    "extends": "./tools/tsconfig",
+    "compilerOptions": {
+        "paths": {
+            "@nativescript-community/health-data": ["src/health-data"],
+            "@nativescript-community/health-data/*": ["src/health-data/*"]
+        }
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "name": "@nativescript-community/template-snippet",
+    "version": "0.0.1",
+    "dependencies": {
+        "@nativescript-community/health-data": "file:../packages/health-data"
+    },
+    "dependenciesMeta": {
+        "@nativescript-community/health-data": {
+            "injected": true
+        }
+    }
+}

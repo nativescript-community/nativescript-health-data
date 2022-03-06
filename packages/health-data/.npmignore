@@ -1,0 +1,11 @@
+node_modules/
+pnpm-global/
+src/
+bin/
+hooks/
+*.ts
+*.map
+*.old
+tsconfig.json
+!*.d.ts
+blueprint.md

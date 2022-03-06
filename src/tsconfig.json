@@ -10,7 +10,7 @@
             "es6",
             "dom"
         ],
-        "emitDecoratorMetadata": true,
+        "emitDecoratorMetadata": false,
         "experimentalDecorators": true,
         "sourceMap": false,
         "pretty": true,

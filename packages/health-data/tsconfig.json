@@ -1,13 +1,13 @@
 {
     "extends": "../../tsconfig.json",
     "compilerOptions": {
-        "rootDir": "../../src/ui-drawer",
+        "rootDir": "../../src/health-data",
         "outDir": "./",
         "paths": {
             "tns-core-modules": ["./node_modules/@nativescript/core"],
             "tns-core-modules/*": ["./node_modules/@nativescript/core/*"]
         }
     },
-    "include": ["../../src/ui-drawer/**/*", "../../references.d.ts", "../../src/references.d.ts"],
-    "exclude": ["../../src/ui-drawer/angular/**"]
+    "include": ["../../src/health-data/**/*", "../../references.d.ts", "../../src/references.d.ts"],
+    "exclude": ["../../src/health-data/angular/**"]
 }

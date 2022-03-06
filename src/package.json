@@ -1,67 +1,67 @@
 {
-  "name": "nativescript-health-data",
-  "version": "1.3.0",
-  "description": "Health Data plugin for Nativescript, using Google Fit and Apple HealthKit.",
-  "main": "health-data",
-  "typings": "index.d.ts",
-  "nativescript": {
-    "platforms": {
-      "android": "3.0.0",
-      "ios": "3.0.0"
-    }
-  },
-  "scripts": {
-    "tsc": "tsc -skipLibCheck",
-    "test.android": "npm i && npm run tsc && npm run tslint && cd ../demo-ng && tns build android && tns test android --justlaunch",
-    "test.ios": "npm i && npm run tsc && npm run tslint && cd ../demo-ng && tns build ios && tns test ios --justlaunch",
-    "tslint": "cd .. && tslint \"**/*.ts\" --config tslint.json --exclude \"**/node_modules/**\" --exclude \"demo-ng/platforms/**\"",
-    "plugin.link": "npm link && cd ../demo-ng && npm link nativescript-health-data && cd ../src",
-    "plugin.tscwatch": "npm run tsc -- -w",
-    "demo.ios": "npm i && npm run tsc && cd ../demo && tns run ios",
-    "demo.android": "npm i && npm run tsc && cd ../demo && tns run android",
-    "clean": "rm -rf node_modules && cd ../demo && rm -rf hooks node_modules platforms && cd ../src && npm run plugin.link",
-    "demo.ng.ios": "npm i && npm run tsc && npm run package && cd ../demo-ng && tns plugin remove nativescript-health-data && tns plugin add ../publish/package/*.tgz && tns run ios",
-    "demo.ng.android": "npm i && npm run tsc && npm run package && cd ../demo-ng && tns plugin remove nativescript-health-data && tns plugin add ../publish/package/*.tgz && tns run android",
-    "plugin.ng.link": "npm link && cd ../demo-ng && npm link nativescript-health-data && cd ../src",
-    "package": "cd ../publish && ./pack.sh",
-    "setup": "npm i && npm run tsc && cd ../demo-ng && npm i"
-  },
-  "keywords": [
-    "NativeScript",
-    "JavaScript",
-    "Android",
-    "iOS",
-    "Health",
-    "HealthKit",
-    "Google Fit"
-  ],
-  "author": {
-    "name": "Eddy Verbruggen",
-    "email": "eddyverbruggen@gmail.com"
-  },
-  "contributors": [
-    {
-      "name": "Filipe Mendes",
-      "email": "filipemendes1994@gmail.com"
-    },
-    {
-      "name": "Daniel Leal",
-      "url": "https://github.com/danielgek"
-    }
-  ],
-  "bugs": {
-    "url": "https://github.com/filipemendes1994/nativescript-health-data/issues"
-  },
-  "license": "MIT",
-  "homepage": "https://github.com/filipemendes1994/nativescript-health-data",
-  "readmeFilename": "README.md",
-  "devDependencies": {
-    "tns-core-modules": "~6.0.0",
-    "tns-platform-declarations": "~6.0.0",
-    "typescript": "3.4.5",
-    "rimraf": "^2.5.0",
-    "tslint": "^5.0.0"
-  },
-  "dependencies": {},
-  "bootstrapper": "nativescript-plugin-seed"
+	"name": "nativescript-health-data",
+	"version": "2.0.0",
+	"description": "Health Data plugin for Nativescript, using Google Fit and Apple HealthKit.",
+	"main": "health-data",
+	"typings": "index.d.ts",
+	"nativescript": {
+		"platforms": {
+			"android": "8.0.0",
+			"ios": "8.0.0"
+		}
+	},
+	"scripts": {
+		"tsc": "tsc -skipLibCheck",
+		"test.android": "npm i && npm run tsc && npm run tslint && cd ../demo-ng && tns build android && tns test android --justlaunch",
+		"test.ios": "npm i && npm run tsc && npm run tslint && cd ../demo-ng && tns build ios && tns test ios --justlaunch",
+		"tslint": "cd .. && tslint \"**/*.ts\" --config tslint.json --exclude \"**/node_modules/**\" --exclude \"demo-ng/platforms/**\"",
+		"plugin.link": "npm link && cd ../demo-ng && npm link nativescript-health-data && cd ../src",
+		"plugin.tscwatch": "npm run tsc -- -w",
+		"demo.ios": "npm i && npm run tsc && cd ../demo && tns run ios",
+		"demo.android": "npm i && npm run tsc && cd ../demo && tns run android",
+		"clean": "rm -rf node_modules && cd ../demo-ng && rm -rf hooks node_modules platforms && cd ../src && npm run plugin.link",
+		"demo.ng.ios": "npm i && npm run tsc && npm run package && cd ../demo-ng && tns plugin remove nativescript-health-data && tns plugin add ../publish/package/*.tgz && tns run ios",
+		"demo.ng.android": "npm i && npm run tsc && npm run package && cd ../demo-ng && tns plugin remove nativescript-health-data && tns plugin add ../publish/package/*.tgz && tns run android",
+		"plugin.ng.link": "npm link && cd ../demo-ng && npm link nativescript-health-data && cd ../src",
+		"package": "cd ../publish && ./pack.sh",
+		"setup": "npm i && npm run tsc && cd ../demo-ng && npm i"
+	},
+	"keywords": [
+		"NativeScript",
+		"JavaScript",
+		"Android",
+		"iOS",
+		"Health",
+		"HealthKit",
+		"Google Fit"
+	],
+	"author": {
+		"name": "Eddy Verbruggen",
+		"email": "eddyverbruggen@gmail.com"
+	},
+	"contributors": [
+		{
+			"name": "Filipe Mendes",
+			"email": "filipemendes1994@gmail.com"
+		},
+		{
+			"name": "Daniel Leal",
+			"url": "https://github.com/danielgek"
+		}
+	],
+	"bugs": {
+		"url": "https://github.com/filipemendes1994/nativescript-health-data/issues"
+	},
+	"license": "MIT",
+	"homepage": "https://github.com/filipemendes1994/nativescript-health-data",
+	"readmeFilename": "README.md",
+	"devDependencies": {
+		"@nativescript/core": "~8.1.5",
+		"@nativescript/types": "~8.1.1",
+		"typescript": "~4.5.5",
+		"rimraf": "^3.0.2",
+		"tslint": "^6.1.3"
+	},
+	"dependencies": {},
+	"bootstrapper": "nativescript-plugin-seed"
 }

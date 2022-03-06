@@ -8,6 +8,6 @@ allprojects {
 }
 
 dependencies {
-	compile 'com.google.android.gms:play-services-fitness:16.0.1'
-    compile 'com.google.android.gms:play-services-auth:16.0.1'
+	implementation 'com.google.android.gms:play-services-fitness:16.0.1'
+    implementation 'com.google.android.gms:play-services-auth:16.0.1'
 }

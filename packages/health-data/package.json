@@ -6,7 +6,8 @@
     "sideEffects": false,
     "typings": "./index.d.ts",
     "scripts": {
-        "build": "npm run tsc && npm run readme",
+        "build": "npm run readme && npm run tsc",
+        "build.watch": "npm run tsc -- -w",
         "build.all": "npm run build && npm run build.angular",
         "build.angular": "../../node_modules/.bin/ng-packagr -p ../../src/health-data/angular/ng-package.json -c ../../src/health-data/angular/tsconfig.json",
         "readme": "../../node_modules/.bin/readme generate -c ../../tools/readme/blueprint.json",

@@ -4,9 +4,10 @@
     "dependencies": {
         "@nativescript-community/health-data": "file:../packages/health-data"
     },
-    "dependenciesMeta": {
-        "@nativescript-community/health-data": {
-            "injected": true
+    "nativescript": {
+        "platforms": {
+            "android": "*",
+            "ios": "*"
         }
     }
 }

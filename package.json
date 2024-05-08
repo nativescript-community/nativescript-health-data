@@ -1,5 +1,5 @@
 {
-    "name": "@healthmine//health-data",
+    "name": "@healthmine/health-data",
     "version": "2.0.0",
     "publishConfig": {
         "registry": "https://npm.pkg.github.com"

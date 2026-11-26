@@ -1,7 +1,7 @@
 # NativeScript
 hooks/
 node_modules/
-/platforms/
+demo*/platforms
 
 # NativeScript Template
 *.js.map
@@ -21,9 +21,11 @@ yarn-error.log*
 .LSOverride
 .idea
 .cloud
+.gradle
 .project
+.yarn
+.cxx
 tmp/
-package-lock.json
 
 !.eslintrc.js
 !.prettierrc.js
@@ -33,24 +35,25 @@ package-lock.json
 devices.js
 
 *.framework
+*.xcframework
 **/*.js.map
 src/**/*.js
-packages/**/*.js
-packages/**/*.d.ts
 bin
 build
 Pods
-!packages/platforms
 /packages/**/*.aar
+/packages/**/*.framework
+/packages/**/*.xcframework
+/demo-snippets/**/*.aar
 *.xcuserdatad
 /packages/README.md
-packages/**/*js.map
 packages/**/*js
-packages/**/angular/*.json
-packages/*.ngsummary.json
-packages/*.metadata.json
-packages/angular
+packages/**/*.d.ts
 packages/typings
-pnpm-lock.yaml
+packages/**/angular
+packages/**/*.ngsummary.json
+packages/**/*.metadata.json
 
 /blueprint.md
+
+*.tsbuildinfo

@@ -1,21 +1,28 @@
 {
-  "packages": [
-    "packages/*"
-  ],
-  "version": "0.0.33",
-  "npmClient": "npm",
-  "command": {
-    "publish": {
-      "conventionalCommits": true,
-      "ignoreChanges": [
-        "ignored-file",
-        "*.md"
-      ]
+    "version": "0.0.33",
+    "$schema": "node_modules/@lerna-lite/cli/schemas/lerna-schema.json",
+    "packages": [
+        "packages/*"
+    ],
+    "npmClient": "yarn",
+    "useWorkspaces": true,
+    "command": {
+        "publish": {
+            "cleanupTempFiles": true
+        }
     },
-    "bootstrap": {
-      "npmClientArgs": [
+    "npmClientArgs": [
         "--no-package-lock"
-      ]
-    }
-  }
+    ],
+    "commitHooks": false,
+    "createRelease": "github",
+    "conventionalCommits": true,
+    "private": false,
+    "message": "chore(release): publish new version %v",
+    "changelogPreset": "conventional-changelog-conventionalcommits",
+    "ignoreChanges": [
+        "**/__fixtures__/**",
+        "**/__tests__/**",
+        "**/*.md"
+    ]
 }
